@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Atmel Studio Solution File, Format Version 11.00
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "BMS", "BMS.cproj", "{ACD0F735-E59E-419D-82A0-205C9158F848}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		bin|AVR = bin|AVR
+		default|AVR = default|AVR
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ACD0F735-E59E-419D-82A0-205C9158F848}.bin|AVR.ActiveCfg = bin|AVR
+		{ACD0F735-E59E-419D-82A0-205C9158F848}.bin|AVR.Build.0 = bin|AVR
+		{ACD0F735-E59E-419D-82A0-205C9158F848}.default|AVR.ActiveCfg = default|AVR
+		{ACD0F735-E59E-419D-82A0-205C9158F848}.default|AVR.Build.0 = default|AVR
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

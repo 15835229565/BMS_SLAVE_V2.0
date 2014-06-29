@@ -1,0 +1,890 @@
+
+BMS.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         000003fc  00000000  00000000  00000074  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .bss          00000009  00800060  00800060  00000470  2**0
+                  ALLOC
+  2 .debug_aranges 00000050  00000000  00000000  00000470  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  3 .debug_pubnames 0000009c  00000000  00000000  000004c0  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  4 .debug_info   00000307  00000000  00000000  0000055c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  5 .debug_abbrev 0000019f  00000000  00000000  00000863  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_line   000004a8  00000000  00000000  00000a02  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_frame  00000080  00000000  00000000  00000eac  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_str    000001b6  00000000  00000000  00000f2c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_loc    000001c9  00000000  00000000  000010e2  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_ranges 00000048  00000000  00000000  000012ab  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+
+	EECR |= (1<<EEWE);                   // Start eeprom write by setting EEPE
+}
+
+unsigned char EEPROM_read(unsigned char ucAddress)
+{
+   0:	09 c0       	rjmp	.+18     	; 0x14 <__ctors_end>
+   2:	16 c0       	rjmp	.+44     	; 0x30 <__bad_interrupt>
+   4:	15 c0       	rjmp	.+42     	; 0x30 <__bad_interrupt>
+   6:	14 c0       	rjmp	.+40     	; 0x30 <__bad_interrupt>
+   8:	13 c0       	rjmp	.+38     	; 0x30 <__bad_interrupt>
+   a:	12 c0       	rjmp	.+36     	; 0x30 <__bad_interrupt>
+   c:	12 c0       	rjmp	.+36     	; 0x32 <__vector_6>
+   e:	10 c0       	rjmp	.+32     	; 0x30 <__bad_interrupt>
+  10:	0f c0       	rjmp	.+30     	; 0x30 <__bad_interrupt>
+  12:	56 c0       	rjmp	.+172    	; 0xc0 <__vector_9>
+
+00000014 <__ctors_end>:
+  14:	11 24       	eor	r1, r1
+  16:	1f be       	out	0x3f, r1	; 63
+  18:	cf e9       	ldi	r28, 0x9F	; 159
+  1a:	cd bf       	out	0x3d, r28	; 61
+
+0000001c <__do_clear_bss>:
+  1c:	10 e0       	ldi	r17, 0x00	; 0
+  1e:	a0 e6       	ldi	r26, 0x60	; 96
+  20:	b0 e0       	ldi	r27, 0x00	; 0
+  22:	01 c0       	rjmp	.+2      	; 0x26 <.do_clear_bss_start>
+
+00000024 <.do_clear_bss_loop>:
+  24:	1d 92       	st	X+, r1
+
+00000026 <.do_clear_bss_start>:
+  26:	a9 36       	cpi	r26, 0x69	; 105
+  28:	b1 07       	cpc	r27, r17
+  2a:	e1 f7       	brne	.-8      	; 0x24 <.do_clear_bss_loop>
+  2c:	85 d0       	rcall	.+266    	; 0x138 <main>
+  2e:	e4 c1       	rjmp	.+968    	; 0x3f8 <_exit>
+
+00000030 <__bad_interrupt>:
+  30:	e7 cf       	rjmp	.-50     	; 0x0 <__vectors>
+
+00000032 <__vector_6>:
+
+//char tx_data[8];
+
+// INT
+ISR(TIM0_COMPA_vect)
+{
+  32:	1f 92       	push	r1
+  34:	0f 92       	push	r0
+  36:	0f b6       	in	r0, 0x3f	; 63
+  38:	0f 92       	push	r0
+  3a:	11 24       	eor	r1, r1
+  3c:	8f 93       	push	r24
+  3e:	9f 93       	push	r25
+	char tmp;
+	// Transmitter Section
+	if (flag_tx_ready)
+  40:	80 91 64 00 	lds	r24, 0x0064
+  44:	88 23       	and	r24, r24
+  46:	29 f1       	breq	.+74     	; 0x92 <__SREG__+0x53>
+	{
+		tmp = timer_tx_ctr;
+  48:	80 91 65 00 	lds	r24, 0x0065
+		if (--tmp <= 0)
+  4c:	81 50       	subi	r24, 0x01	; 1
+  4e:	f9 f4       	brne	.+62     	; 0x8e <__SREG__+0x4f>
+		{
+			if (internal_tx_buffer & 0x01)
+  50:	80 91 67 00 	lds	r24, 0x0067
+  54:	90 91 68 00 	lds	r25, 0x0068
+  58:	80 ff       	sbrs	r24, 0
+  5a:	02 c0       	rjmp	.+4      	; 0x60 <__SREG__+0x21>
+			{
+				set_tx_pin_high();
+  5c:	c2 9a       	sbi	0x18, 2	; 24
+  5e:	01 c0       	rjmp	.+2      	; 0x62 <__SREG__+0x23>
+				//set_tx_pin_low();
+			}
+			else
+			{
+				set_tx_pin_low();
+  60:	c2 98       	cbi	0x18, 2	; 24
+				//set_tx_pin_high();
+			}
+			internal_tx_buffer >>= 1;
+  62:	80 91 67 00 	lds	r24, 0x0067
+  66:	90 91 68 00 	lds	r25, 0x0068
+  6a:	96 95       	lsr	r25
+  6c:	87 95       	ror	r24
+  6e:	90 93 68 00 	sts	0x0068, r25
+  72:	80 93 67 00 	sts	0x0067, r24
+			tmp = 3;
+			if (--bits_left_in_tx <= 0)
+  76:	80 91 66 00 	lds	r24, 0x0066
+  7a:	81 50       	subi	r24, 0x01	; 1
+  7c:	80 93 66 00 	sts	0x0066, r24
+  80:	80 91 66 00 	lds	r24, 0x0066
+  84:	88 23       	and	r24, r24
+  86:	11 f4       	brne	.+4      	; 0x8c <__SREG__+0x4d>
+			{
+				flag_tx_ready = SU_FALSE;
+  88:	10 92 64 00 	sts	0x0064, r1
+  8c:	83 e0       	ldi	r24, 0x03	; 3
+			}
+		}
+		timer_tx_ctr = tmp;
+  8e:	80 93 65 00 	sts	0x0065, r24
+	}
+
+	// ADC
+	if (ADC_go == 1)
+  92:	80 91 63 00 	lds	r24, 0x0063
+  96:	81 30       	cpi	r24, 0x01	; 1
+  98:	19 f4       	brne	.+6      	; 0xa0 <__stack+0x1>
+	{
+		ADCSRA SET (1<<ADSC);   // Start ADC
+  9a:	36 9a       	sbi	0x06, 6	; 6
+		ADC_go = 0;
+  9c:	10 92 63 00 	sts	0x0063, r1
+	}
+
+	// Timer
+	cnt++;
+  a0:	80 91 60 00 	lds	r24, 0x0060
+  a4:	90 91 61 00 	lds	r25, 0x0061
+  a8:	01 96       	adiw	r24, 0x01	; 1
+  aa:	90 93 61 00 	sts	0x0061, r25
+  ae:	80 93 60 00 	sts	0x0060, r24
+}
+  b2:	9f 91       	pop	r25
+  b4:	8f 91       	pop	r24
+  b6:	0f 90       	pop	r0
+  b8:	0f be       	out	0x3f, r0	; 63
+  ba:	0f 90       	pop	r0
+  bc:	1f 90       	pop	r1
+  be:	18 95       	reti
+
+000000c0 <__vector_9>:
+{
+	//  cnt--;
+}*/
+
+ISR(ADC_vect)
+{
+  c0:	1f 92       	push	r1
+  c2:	0f 92       	push	r0
+  c4:	0f b6       	in	r0, 0x3f	; 63
+  c6:	0f 92       	push	r0
+  c8:	11 24       	eor	r1, r1
+  ca:	8f 93       	push	r24
+	ADC_done = 1;
+  cc:	81 e0       	ldi	r24, 0x01	; 1
+  ce:	80 93 62 00 	sts	0x0062, r24
+	//  ADCSRA SET (1<<ADSC); Start ADC
+}
+  d2:	8f 91       	pop	r24
+  d4:	0f 90       	pop	r0
+  d6:	0f be       	out	0x3f, r0	; 63
+  d8:	0f 90       	pop	r0
+  da:	1f 90       	pop	r1
+  dc:	18 95       	reti
+
+000000de <softuart_putchar>:
+{
+	return ( flag_tx_ready );
+}*/
+
+void softuart_putchar( const char ch )
+{
+  de:	98 2f       	mov	r25, r24
+	while ( flag_tx_ready ) {
+  e0:	80 91 64 00 	lds	r24, 0x0064
+  e4:	88 23       	and	r24, r24
+  e6:	e1 f7       	brne	.-8      	; 0xe0 <softuart_putchar+0x2>
+		; // wait for transmitter ready
+		// add watchdog-reset here if needed;
+	}
+
+	// invoke_UART_transmit
+	timer_tx_ctr       = 3;
+  e8:	83 e0       	ldi	r24, 0x03	; 3
+  ea:	80 93 65 00 	sts	0x0065, r24
+	bits_left_in_tx    = TX_NUM_OF_BITS;
+  ee:	8a e0       	ldi	r24, 0x0A	; 10
+  f0:	80 93 66 00 	sts	0x0066, r24
+	internal_tx_buffer = ( ch<<1 ) | 0x200;
+  f4:	89 2f       	mov	r24, r25
+  f6:	90 e0       	ldi	r25, 0x00	; 0
+  f8:	88 0f       	add	r24, r24
+  fa:	99 1f       	adc	r25, r25
+  fc:	92 60       	ori	r25, 0x02	; 2
+  fe:	90 93 68 00 	sts	0x0068, r25
+ 102:	80 93 67 00 	sts	0x0067, r24
+	flag_tx_ready      = SU_TRUE;
+ 106:	81 e0       	ldi	r24, 0x01	; 1
+ 108:	80 93 64 00 	sts	0x0064, r24
+}
+ 10c:	08 95       	ret
+
+0000010e <adc_init>:
+
+// INIT
+void adc_init()
+{
+
+	ADMUX = (1<<REFS0) | (0<<ADLAR) | (1<<MUX1) | (1<<MUX0);   // 1.1V=VREF, PB3 input MUX
+ 10e:	83 e4       	ldi	r24, 0x43	; 67
+ 110:	87 b9       	out	0x07, r24	; 7
+
+	ADCSRA = (1<<ADEN) | (0<<ADSC) | (0<<ADATE) | (0<<ADIF) | (0<<ADIE) | (1<<ADPS2) | (0<<ADPS1) | (0<<ADPS0);
+ 112:	84 e8       	ldi	r24, 0x84	; 132
+ 114:	86 b9       	out	0x06, r24	; 6
+
+	//  DIDR0 = (1<<ADC0D) | (0<<ADC1D) | (0<<ADC2D ) | (0<<ADC3D); // ADC0 input buffer OFF
+	DIDR0 = (0<<ADC0D) | (0<<ADC1D) | (0<<ADC2D ) | (1<<ADC3D);   // ADC0 input buffer OFF
+ 116:	88 e0       	ldi	r24, 0x08	; 8
+ 118:	84 bb       	out	0x14, r24	; 20
+
+	//  Initialise ADC, ignore first result
+	ADCSRA SET (1<<ADSC);      // START ACDC
+ 11a:	36 9a       	sbi	0x06, 6	; 6
+	while( ADCSRA & (1<<ADSC) ) {} // Pool ADC
+ 11c:	36 99       	sbic	0x06, 6	; 6
+ 11e:	fe cf       	rjmp	.-4      	; 0x11c <adc_init+0xe>
+	
+	ADCSRB = (0<<ADTS2) | (1<<ADTS1) | (1<<ADTS0 );
+ 120:	83 e0       	ldi	r24, 0x03	; 3
+ 122:	83 b9       	out	0x03, r24	; 3
+	ADCSRA SET (1<<ADIE);      // Enable ADC interrupt
+ 124:	33 9a       	sbi	0x06, 3	; 6
+	
+	// ADCSRA SET (1<<ADSC);     // START ACD
+}
+ 126:	08 95       	ret
+
+00000128 <EEPROM_write>:
+
+// EEPROM
+void EEPROM_write(unsigned char ucAddress, unsigned char ucData)
+{
+
+	while(EECR & (1<<EEWE));             // Wait for completion of previous write
+ 128:	e1 99       	sbic	0x1c, 1	; 28
+ 12a:	fe cf       	rjmp	.-4      	; 0x128 <EEPROM_write>
+
+	EECR = (0<<EEPM1)|(0>>EEPM0);        // Set Programming mode
+ 12c:	1c ba       	out	0x1c, r1	; 28
+
+	EEARL = ucAddress;                   // Set up address and data registers
+ 12e:	8e bb       	out	0x1e, r24	; 30
+	
+	EEDR = ucData;
+ 130:	6d bb       	out	0x1d, r22	; 29
+	
+	EECR |= (1<<EEMWE);                  // Write logical one to EEMPE
+ 132:	e2 9a       	sbi	0x1c, 2	; 28
+
+	EECR |= (1<<EEWE);                   // Start eeprom write by setting EEPE
+ 134:	e1 9a       	sbi	0x1c, 1	; 28
+}
+ 136:	08 95       	ret
+
+00000138 <main>:
+	}
+}*/
+
+// MAIN
+int main(void)
+{
+ 138:	2f 92       	push	r2
+ 13a:	3f 92       	push	r3
+ 13c:	4f 92       	push	r4
+ 13e:	5f 92       	push	r5
+ 140:	6f 92       	push	r6
+ 142:	7f 92       	push	r7
+ 144:	8f 92       	push	r8
+ 146:	9f 92       	push	r9
+ 148:	af 92       	push	r10
+ 14a:	bf 92       	push	r11
+ 14c:	cf 92       	push	r12
+ 14e:	df 92       	push	r13
+ 150:	ef 92       	push	r14
+ 152:	ff 92       	push	r15
+ 154:	0f 93       	push	r16
+ 156:	1f 93       	push	r17
+ 158:	df 93       	push	r29
+ 15a:	cf 93       	push	r28
+ 15c:	00 d0       	rcall	.+0      	; 0x15e <main+0x26>
+ 15e:	00 d0       	rcall	.+0      	; 0x160 <main+0x28>
+ 160:	cd b7       	in	r28, 0x3d	; 61
+ 162:	de b7       	in	r29, 0x3e	; 62
+	volatile unsigned short ADC_result;
+
+	char Bat_status; 
+	unsigned long miliVolt=0;
+	unsigned short RefVolt;
+	wdt_enable(WDTO_2S);       // Set WDT for 2sek
+ 164:	2f e0       	ldi	r18, 0x0F	; 15
+ 166:	88 e1       	ldi	r24, 0x18	; 24
+ 168:	90 e0       	ldi	r25, 0x00	; 0
+ 16a:	0f b6       	in	r0, 0x3f	; 63
+ 16c:	f8 94       	cli
+ 16e:	a8 95       	wdr
+ 170:	81 bd       	out	0x21, r24	; 33
+ 172:	0f be       	out	0x3f, r0	; 63
+ 174:	21 bd       	out	0x21, r18	; 33
+	wdt_reset();               // Reset WDT.
+ 176:	a8 95       	wdr
+
+	//DDRB = 0xFF;
+	DDRB = 0x37;
+ 178:	87 e3       	ldi	r24, 0x37	; 55
+ 17a:	87 bb       	out	0x17, r24	; 23
+	
+	//comm_mode = EEPROM_read(EE_COMM);
+	set_over_pin();
+ 17c:	c0 9a       	sbi	0x18, 0	; 24
+	set_under_pin();
+ 17e:	c4 9a       	sbi	0x18, 4	; 24
+
+	flag_tx_ready = SU_FALSE;
+ 180:	10 92 64 00 	sts	0x0064, r1
+	set_tx_pin_high();                   // mt: set to high to avoid garbage on init
+ 184:	c2 9a       	sbi	0x18, 2	; 24
+
+	ADC_done = 0;
+ 186:	10 92 62 00 	sts	0x0062, r1
+	ADC_go = 0;
+ 18a:	10 92 63 00 	sts	0x0063, r1
+
+	adc_init();
+ 18e:	bf df       	rcall	.-130    	; 0x10e <adc_init>
+
+static void timer_init(void)
+{
+	unsigned char sreg_tmp;
+	
+	sreg_tmp = SREG;
+ 190:	9f b7       	in	r25, 0x3f	; 63
+	cli();
+ 192:	f8 94       	cli
+	CLKPR=0b10000011;			//system clock prescaler by 8
+ 194:	83 e8       	ldi	r24, 0x83	; 131
+ 196:	86 bd       	out	0x26, r24	; 38
+	OCR0A = TIMERTOP;          /* set top */
+ 198:	85 ea       	ldi	r24, 0xA5	; 165
+ 19a:	86 bf       	out	0x36, r24	; 54
+	OCR0B = 0;                 /* set PWM-B */
+ 19c:	19 bc       	out	0x29, r1	; 41
+
+	TCCR0A = PRESC_MASKA | (1<<WGM00) | (1<<COM0B1) | (0<<COM0B0);
+ 19e:	81 e2       	ldi	r24, 0x21	; 33
+ 1a0:	8f bd       	out	0x2f, r24	; 47
+	TCCR0B = PRESC_MASKB | (1<<WGM02);
+ 1a2:	89 e0       	ldi	r24, 0x09	; 9
+ 1a4:	83 bf       	out	0x33, r24	; 51
+
+	TIMSK0 |= CMPINT_EN_MASK;
+ 1a6:	89 b7       	in	r24, 0x39	; 57
+ 1a8:	84 60       	ori	r24, 0x04	; 4
+ 1aa:	89 bf       	out	0x39, r24	; 57
+
+	TCNT0 = 0;                 /* reset counter */
+ 1ac:	12 be       	out	0x32, r1	; 50
+	
+	SREG = sreg_tmp;
+ 1ae:	9f bf       	out	0x3f, r25	; 63
+}
+
+unsigned char EEPROM_read(unsigned char ucAddress)
+{
+
+	while(EECR & (1<<EEWE));             // Wait for completion of previous write
+ 1b0:	e1 99       	sbic	0x1c, 1	; 28
+ 1b2:	fe cf       	rjmp	.-4      	; 0x1b0 <main+0x78>
+
+	EEARL = ucAddress;                   // Set up address register
+ 1b4:	81 e0       	ldi	r24, 0x01	; 1
+ 1b6:	8e bb       	out	0x1e, r24	; 30
+
+	EECR |= (1<<EERE);                   // Start eeprom read by writing EERE
+ 1b8:	e0 9a       	sbi	0x1c, 0	; 28
+
+	return EEDR;                         // Return data from data register
+ 1ba:	8d b3       	in	r24, 0x1d	; 29
+	ADC_go = 0;
+
+	adc_init();
+	timer_init();
+	//read ADC calibration values from EEPROM if BMS was already calibrated
+	if (EEPROM_read(EE_ADC_CALIBRATED)==1){
+ 1bc:	81 30       	cpi	r24, 0x01	; 1
+ 1be:	b1 f4       	brne	.+44     	; 0x1ec <main+0xb4>
+}
+
+unsigned char EEPROM_read(unsigned char ucAddress)
+{
+
+	while(EECR & (1<<EEWE));             // Wait for completion of previous write
+ 1c0:	e1 99       	sbic	0x1c, 1	; 28
+ 1c2:	fe cf       	rjmp	.-4      	; 0x1c0 <main+0x88>
+
+	EEARL = ucAddress;                   // Set up address register
+ 1c4:	82 e0       	ldi	r24, 0x02	; 2
+ 1c6:	8e bb       	out	0x1e, r24	; 30
+
+	EECR |= (1<<EERE);                   // Start eeprom read by writing EERE
+ 1c8:	e0 9a       	sbi	0x1c, 0	; 28
+
+	return EEDR;                         // Return data from data register
+ 1ca:	8d b3       	in	r24, 0x1d	; 29
+
+	adc_init();
+	timer_init();
+	//read ADC calibration values from EEPROM if BMS was already calibrated
+	if (EEPROM_read(EE_ADC_CALIBRATED)==1){
+		ad_H = EEPROM_read(EE_ADC_HI); //ADC calibration value
+ 1cc:	89 83       	std	Y+1, r24	; 0x01
+}
+
+unsigned char EEPROM_read(unsigned char ucAddress)
+{
+
+	while(EECR & (1<<EEWE));             // Wait for completion of previous write
+ 1ce:	e1 99       	sbic	0x1c, 1	; 28
+ 1d0:	fe cf       	rjmp	.-4      	; 0x1ce <main+0x96>
+
+	EEARL = ucAddress;                   // Set up address register
+ 1d2:	83 e0       	ldi	r24, 0x03	; 3
+ 1d4:	8e bb       	out	0x1e, r24	; 30
+
+	EECR |= (1<<EERE);                   // Start eeprom read by writing EERE
+ 1d6:	e0 9a       	sbi	0x1c, 0	; 28
+
+	return EEDR;                         // Return data from data register
+ 1d8:	8d b3       	in	r24, 0x1d	; 29
+	adc_init();
+	timer_init();
+	//read ADC calibration values from EEPROM if BMS was already calibrated
+	if (EEPROM_read(EE_ADC_CALIBRATED)==1){
+		ad_H = EEPROM_read(EE_ADC_HI); //ADC calibration value
+		ad_L = EEPROM_read(EE_ADC_LO);
+ 1da:	8a 83       	std	Y+2, r24	; 0x02
+		RefVolt=(ad_H << 8) + ad_L;
+ 1dc:	29 81       	ldd	r18, Y+1	; 0x01
+ 1de:	3a 81       	ldd	r19, Y+2	; 0x02
+ 1e0:	92 2f       	mov	r25, r18
+ 1e2:	80 e0       	ldi	r24, 0x00	; 0
+ 1e4:	6c 01       	movw	r12, r24
+ 1e6:	c3 0e       	add	r12, r19
+ 1e8:	d1 1c       	adc	r13, r1
+ 1ea:	36 c0       	rjmp	.+108    	; 0x258 <main+0x120>
+ 1ec:	40 e0       	ldi	r20, 0x00	; 0
+ 1ee:	50 e0       	ldi	r21, 0x00	; 0
+ 1f0:	60 e0       	ldi	r22, 0x00	; 0
+ 1f2:	70 e0       	ldi	r23, 0x00	; 0
+ 1f4:	e0 e0       	ldi	r30, 0x00	; 0
+ 1f6:	f0 e0       	ldi	r31, 0x00	; 0
+	}else{
+		//take 10 measurements
+		for (int i=0; i<10; i++){
+			ADCSRA SET (1<<ADSC);             // START ACDC
+ 1f8:	36 9a       	sbi	0x06, 6	; 6
+			while( ADCSRA & (1<<ADSC) ) {}    // Pool ADC
+ 1fa:	36 99       	sbic	0x06, 6	; 6
+ 1fc:	fe cf       	rjmp	.-4      	; 0x1fa <main+0xc2>
+			ad_L = ADCL;
+ 1fe:	84 b1       	in	r24, 0x04	; 4
+ 200:	8a 83       	std	Y+2, r24	; 0x02
+			ad_H = ADCH;
+ 202:	85 b1       	in	r24, 0x05	; 5
+ 204:	89 83       	std	Y+1, r24	; 0x01
+			miliVolt+=(ad_H << 8) + ad_L;
+ 206:	89 81       	ldd	r24, Y+1	; 0x01
+ 208:	9a 81       	ldd	r25, Y+2	; 0x02
+ 20a:	38 2f       	mov	r19, r24
+ 20c:	20 e0       	ldi	r18, 0x00	; 0
+ 20e:	d9 01       	movw	r26, r18
+ 210:	a9 0f       	add	r26, r25
+ 212:	b1 1d       	adc	r27, r1
+ 214:	cd 01       	movw	r24, r26
+ 216:	aa 27       	eor	r26, r26
+ 218:	97 fd       	sbrc	r25, 7
+ 21a:	a0 95       	com	r26
+ 21c:	ba 2f       	mov	r27, r26
+ 21e:	48 0f       	add	r20, r24
+ 220:	59 1f       	adc	r21, r25
+ 222:	6a 1f       	adc	r22, r26
+ 224:	7b 1f       	adc	r23, r27
+		ad_H = EEPROM_read(EE_ADC_HI); //ADC calibration value
+		ad_L = EEPROM_read(EE_ADC_LO);
+		RefVolt=(ad_H << 8) + ad_L;
+	}else{
+		//take 10 measurements
+		for (int i=0; i<10; i++){
+ 226:	31 96       	adiw	r30, 0x01	; 1
+ 228:	ea 30       	cpi	r30, 0x0A	; 10
+ 22a:	f1 05       	cpc	r31, r1
+ 22c:	29 f7       	brne	.-54     	; 0x1f8 <main+0xc0>
+			while( ADCSRA & (1<<ADSC) ) {}    // Pool ADC
+			ad_L = ADCL;
+			ad_H = ADCH;
+			miliVolt+=(ad_H << 8) + ad_L;
+		}
+		miliVolt/=10;
+ 22e:	cb 01       	movw	r24, r22
+ 230:	ba 01       	movw	r22, r20
+ 232:	2a e0       	ldi	r18, 0x0A	; 10
+ 234:	30 e0       	ldi	r19, 0x00	; 0
+ 236:	40 e0       	ldi	r20, 0x00	; 0
+ 238:	50 e0       	ldi	r21, 0x00	; 0
+ 23a:	a1 d0       	rcall	.+322    	; 0x37e <__udivmodsi4>
+ 23c:	12 2f       	mov	r17, r18
+ 23e:	03 2f       	mov	r16, r19
+		EEPROM_write(EE_ADC_HI, ((miliVolt & 0x0000FF00L) >> 8));
+ 240:	82 e0       	ldi	r24, 0x02	; 2
+ 242:	63 2f       	mov	r22, r19
+ 244:	71 df       	rcall	.-286    	; 0x128 <EEPROM_write>
+		EEPROM_write(EE_ADC_LO, ((miliVolt & 0x000000FFL)));
+ 246:	83 e0       	ldi	r24, 0x03	; 3
+ 248:	61 2f       	mov	r22, r17
+ 24a:	6e df       	rcall	.-292    	; 0x128 <EEPROM_write>
+		EEPROM_write(EE_ADC_CALIBRATED, 1);
+ 24c:	81 e0       	ldi	r24, 0x01	; 1
+ 24e:	61 e0       	ldi	r22, 0x01	; 1
+ 250:	6b df       	rcall	.-298    	; 0x128 <EEPROM_write>
+		RefVolt=miliVolt;
+ 252:	81 2f       	mov	r24, r17
+ 254:	90 2f       	mov	r25, r16
+ 256:	6c 01       	movw	r12, r24
+	//miliVolt=6990;   //610
+	
+	/*
+	miliVolt*=100; //multiplication before devision to minimize error
+	miliVolt /= BMS_programm_voltage;*/
+	sei();                               // ENABLE interupt
+ 258:	78 94       	sei
+			ad_L = ADCL;
+			ad_H = ADCH;
+			//voltage in milivolts = ADCvalue*ProgrammingVoltage/EEPROMreference
+			ADC_result = (ad_H << 8) + ad_L; // AD value
+	
+			miliVolt = (ADC_result * (long)BMS_programm_voltage)/(long)RefVolt;		
+ 25a:	26 01       	movw	r4, r12
+ 25c:	66 24       	eor	r6, r6
+ 25e:	77 24       	eor	r7, r7
+			// - set status on UART
+			//if ((ADC_result <= RefVolt) && (miliVolt >=Li_Min))
+			if ((ADC_result <= RefVolt))
+			{
+				//if battery is allready full we do some offset for status
+				if(Bat_status=='O' && (ADC_result >= (RefVolt-20))) Bat_status ='O';
+ 260:	6c ee       	ldi	r22, 0xEC	; 236
+ 262:	26 2e       	mov	r2, r22
+ 264:	6f ef       	ldi	r22, 0xFF	; 255
+ 266:	36 2e       	mov	r3, r22
+ 268:	2c 0c       	add	r2, r12
+ 26a:	3d 1c       	adc	r3, r13
+		}
+		if (cnt >= 360)                    // 1/20sek
+		{
+			//        PORTB SET (1<<PB4);
+			cnt = 0;
+			ADC_go = 1;                      // Naslednja prekinitev prozi ADC
+ 26c:	88 24       	eor	r8, r8
+ 26e:	83 94       	inc	r8
+	miliVolt /= BMS_programm_voltage;*/
+	sei();                               // ENABLE interupt
+
+	while (1)
+	{
+		if (ADC_done == 1)                 // Preveri ali imamo novo meritev napetosti na bateriji
+ 270:	80 91 62 00 	lds	r24, 0x0062
+ 274:	81 30       	cpi	r24, 0x01	; 1
+ 276:	09 f0       	breq	.+2      	; 0x27a <main+0x142>
+ 278:	5a c0       	rjmp	.+180    	; 0x32e <main+0x1f6>
+		{
+			
+			ADC_done = 0;  // Reset AD readout flag
+ 27a:	10 92 62 00 	sts	0x0062, r1
+			ad_L = ADCL;
+ 27e:	84 b1       	in	r24, 0x04	; 4
+ 280:	8a 83       	std	Y+2, r24	; 0x02
+			ad_H = ADCH;
+ 282:	85 b1       	in	r24, 0x05	; 5
+ 284:	89 83       	std	Y+1, r24	; 0x01
+			//voltage in milivolts = ADCvalue*ProgrammingVoltage/EEPROMreference
+			ADC_result = (ad_H << 8) + ad_L; // AD value
+ 286:	89 81       	ldd	r24, Y+1	; 0x01
+ 288:	9a 81       	ldd	r25, Y+2	; 0x02
+ 28a:	b8 2e       	mov	r11, r24
+ 28c:	aa 24       	eor	r10, r10
+ 28e:	95 01       	movw	r18, r10
+ 290:	29 0f       	add	r18, r25
+ 292:	31 1d       	adc	r19, r1
+ 294:	3c 83       	std	Y+4, r19	; 0x04
+ 296:	2b 83       	std	Y+3, r18	; 0x03
+	
+			miliVolt = (ADC_result * (long)BMS_programm_voltage)/(long)RefVolt;		
+ 298:	6b 81       	ldd	r22, Y+3	; 0x03
+ 29a:	7c 81       	ldd	r23, Y+4	; 0x04
+ 29c:	80 e0       	ldi	r24, 0x00	; 0
+ 29e:	90 e0       	ldi	r25, 0x00	; 0
+ 2a0:	26 ea       	ldi	r18, 0xA6	; 166
+ 2a2:	3e e0       	ldi	r19, 0x0E	; 14
+ 2a4:	40 e0       	ldi	r20, 0x00	; 0
+ 2a6:	50 e0       	ldi	r21, 0x00	; 0
+ 2a8:	51 d0       	rcall	.+162    	; 0x34c <__mulsi3>
+ 2aa:	a3 01       	movw	r20, r6
+ 2ac:	92 01       	movw	r18, r4
+ 2ae:	89 d0       	rcall	.+274    	; 0x3c2 <__divmodsi4>
+ 2b0:	79 01       	movw	r14, r18
+ 2b2:	8a 01       	movw	r16, r20
+			// Cell voltage more than full. Start balancing
+			// - decrease charging curernt to 1A
+			// - set signal on optocoupler
+			// - set status on UART
+			//if ((ADC_result > RefVolt) && (miliVolt <= Li_Max)){
+			if ((ADC_result > RefVolt)){
+ 2b4:	8b 81       	ldd	r24, Y+3	; 0x03
+ 2b6:	9c 81       	ldd	r25, Y+4	; 0x04
+ 2b8:	c8 16       	cp	r12, r24
+ 2ba:	d9 06       	cpc	r13, r25
+ 2bc:	40 f4       	brcc	.+16     	; 0x2ce <main+0x196>
+				//clr_over_pin(); // optocoupler signaling
+				//set_under_pin();  //optocoupler signaling
+				Bat_status = 'O';
+				//increse PWM
+				if (OCR0B < TIMERTOP)
+ 2be:	89 b5       	in	r24, 0x29	; 41
+ 2c0:	85 3a       	cpi	r24, 0xA5	; 165
+ 2c2:	18 f4       	brcc	.+6      	; 0x2ca <main+0x192>
+				{
+					OCR0B++;
+ 2c4:	89 b5       	in	r24, 0x29	; 41
+ 2c6:	8f 5f       	subi	r24, 0xFF	; 255
+ 2c8:	89 bd       	out	0x29, r24	; 41
+ 2ca:	5f e4       	ldi	r21, 0x4F	; 79
+ 2cc:	95 2e       	mov	r9, r21
+			}
+			// cell voltage at absolute maximum
+			// - stop charging
+			// - set signal on optocoupler
+			// - set status on UART
+			if (miliVolt > Li_Max){
+ 2ce:	3f e6       	ldi	r19, 0x6F	; 111
+ 2d0:	e3 16       	cp	r14, r19
+ 2d2:	3f e0       	ldi	r19, 0x0F	; 15
+ 2d4:	f3 06       	cpc	r15, r19
+ 2d6:	30 e0       	ldi	r19, 0x00	; 0
+ 2d8:	03 07       	cpc	r16, r19
+ 2da:	30 e0       	ldi	r19, 0x00	; 0
+ 2dc:	13 07       	cpc	r17, r19
+ 2de:	10 f0       	brcs	.+4      	; 0x2e4 <main+0x1ac>
+ 2e0:	41 e5       	ldi	r20, 0x51	; 81
+ 2e2:	94 2e       	mov	r9, r20
+			// Cell voltage below full.
+			// - full charging
+			// - set signal on optocoupler
+			// - set status on UART
+			//if ((ADC_result <= RefVolt) && (miliVolt >=Li_Min))
+			if ((ADC_result <= RefVolt))
+ 2e4:	8b 81       	ldd	r24, Y+3	; 0x03
+ 2e6:	9c 81       	ldd	r25, Y+4	; 0x04
+ 2e8:	c8 16       	cp	r12, r24
+ 2ea:	d9 06       	cpc	r13, r25
+ 2ec:	80 f0       	brcs	.+32     	; 0x30e <main+0x1d6>
+			{
+				//if battery is allready full we do some offset for status
+				if(Bat_status=='O' && (ADC_result >= (RefVolt-20))) Bat_status ='O';
+ 2ee:	8f e4       	ldi	r24, 0x4F	; 79
+ 2f0:	98 16       	cp	r9, r24
+ 2f2:	29 f4       	brne	.+10     	; 0x2fe <main+0x1c6>
+ 2f4:	8b 81       	ldd	r24, Y+3	; 0x03
+ 2f6:	9c 81       	ldd	r25, Y+4	; 0x04
+ 2f8:	82 15       	cp	r24, r2
+ 2fa:	93 05       	cpc	r25, r3
+ 2fc:	10 f4       	brcc	.+4      	; 0x302 <main+0x1ca>
+ 2fe:	33 e4       	ldi	r19, 0x43	; 67
+ 300:	93 2e       	mov	r9, r19
+				else Bat_status='C';
+				if (OCR0B > 0)
+ 302:	89 b5       	in	r24, 0x29	; 41
+ 304:	88 23       	and	r24, r24
+ 306:	19 f0       	breq	.+6      	; 0x30e <main+0x1d6>
+				{
+					OCR0B--;
+ 308:	89 b5       	in	r24, 0x29	; 41
+ 30a:	81 50       	subi	r24, 0x01	; 1
+ 30c:	89 bd       	out	0x29, r24	; 41
+			}
+			*/
+
+			// send to UART
+			//miliVolt=0xAABB;
+			softuart_putchar('>');
+ 30e:	8e e3       	ldi	r24, 0x3E	; 62
+ 310:	e6 de       	rcall	.-564    	; 0xde <softuart_putchar>
+			softuart_putchar(Bat_status);
+ 312:	89 2d       	mov	r24, r9
+ 314:	e4 de       	rcall	.-568    	; 0xde <softuart_putchar>
+			softuart_putchar('-');
+ 316:	8d e2       	ldi	r24, 0x2D	; 45
+ 318:	e2 de       	rcall	.-572    	; 0xde <softuart_putchar>
+			// softuart_putchar((miliVolt & 0xFF000000L) >> 24);    //Apply the high byte of the data 
+			// softuart_putchar((miliVolt & 0x00FF0000L) >> 16);   // Apply the uppper middle byte of the data 
+			softuart_putchar((miliVolt & 0x0000FF00L) >> 8);   // Apply the lower middle byte of the data 
+ 31a:	8f 2d       	mov	r24, r15
+ 31c:	e0 de       	rcall	.-576    	; 0xde <softuart_putchar>
+			softuart_putchar((miliVolt & 0x000000FFL));      // Apply the low byte of the data 
+ 31e:	8e 2d       	mov	r24, r14
+ 320:	de de       	rcall	.-580    	; 0xde <softuart_putchar>
+			
+			
+			softuart_putchar(0);
+ 322:	80 e0       	ldi	r24, 0x00	; 0
+ 324:	dc de       	rcall	.-584    	; 0xde <softuart_putchar>
+			softuart_putchar('\r');
+ 326:	8d e0       	ldi	r24, 0x0D	; 13
+ 328:	da de       	rcall	.-588    	; 0xde <softuart_putchar>
+			softuart_putchar('\0');
+ 32a:	80 e0       	ldi	r24, 0x00	; 0
+ 32c:	d8 de       	rcall	.-592    	; 0xde <softuart_putchar>
+
+		
+		}
+		if (cnt >= 360)                    // 1/20sek
+ 32e:	80 91 60 00 	lds	r24, 0x0060
+ 332:	90 91 61 00 	lds	r25, 0x0061
+ 336:	88 56       	subi	r24, 0x68	; 104
+ 338:	91 40       	sbci	r25, 0x01	; 1
+ 33a:	30 f0       	brcs	.+12     	; 0x348 <main+0x210>
+		{
+			//        PORTB SET (1<<PB4);
+			cnt = 0;
+ 33c:	10 92 61 00 	sts	0x0061, r1
+ 340:	10 92 60 00 	sts	0x0060, r1
+			ADC_go = 1;                      // Naslednja prekinitev prozi ADC
+ 344:	80 92 63 00 	sts	0x0063, r8
+		}
+		wdt_reset();                       // Kuza pazi "sedi".
+ 348:	a8 95       	wdr
+ 34a:	92 cf       	rjmp	.-220    	; 0x270 <main+0x138>
+
+0000034c <__mulsi3>:
+ 34c:	ff 27       	eor	r31, r31
+ 34e:	ee 27       	eor	r30, r30
+ 350:	bb 27       	eor	r27, r27
+ 352:	aa 27       	eor	r26, r26
+
+00000354 <__mulsi3_loop>:
+ 354:	60 ff       	sbrs	r22, 0
+ 356:	04 c0       	rjmp	.+8      	; 0x360 <__mulsi3_skip1>
+ 358:	a2 0f       	add	r26, r18
+ 35a:	b3 1f       	adc	r27, r19
+ 35c:	e4 1f       	adc	r30, r20
+ 35e:	f5 1f       	adc	r31, r21
+
+00000360 <__mulsi3_skip1>:
+ 360:	22 0f       	add	r18, r18
+ 362:	33 1f       	adc	r19, r19
+ 364:	44 1f       	adc	r20, r20
+ 366:	55 1f       	adc	r21, r21
+ 368:	96 95       	lsr	r25
+ 36a:	87 95       	ror	r24
+ 36c:	77 95       	ror	r23
+ 36e:	67 95       	ror	r22
+ 370:	89 f7       	brne	.-30     	; 0x354 <__mulsi3_loop>
+ 372:	00 97       	sbiw	r24, 0x00	; 0
+ 374:	76 07       	cpc	r23, r22
+ 376:	71 f7       	brne	.-36     	; 0x354 <__mulsi3_loop>
+
+00000378 <__mulsi3_exit>:
+ 378:	cf 01       	movw	r24, r30
+ 37a:	bd 01       	movw	r22, r26
+ 37c:	08 95       	ret
+
+0000037e <__udivmodsi4>:
+ 37e:	a1 e2       	ldi	r26, 0x21	; 33
+ 380:	1a 2e       	mov	r1, r26
+ 382:	aa 1b       	sub	r26, r26
+ 384:	bb 1b       	sub	r27, r27
+ 386:	fd 01       	movw	r30, r26
+ 388:	0d c0       	rjmp	.+26     	; 0x3a4 <__udivmodsi4_ep>
+
+0000038a <__udivmodsi4_loop>:
+ 38a:	aa 1f       	adc	r26, r26
+ 38c:	bb 1f       	adc	r27, r27
+ 38e:	ee 1f       	adc	r30, r30
+ 390:	ff 1f       	adc	r31, r31
+ 392:	a2 17       	cp	r26, r18
+ 394:	b3 07       	cpc	r27, r19
+ 396:	e4 07       	cpc	r30, r20
+ 398:	f5 07       	cpc	r31, r21
+ 39a:	20 f0       	brcs	.+8      	; 0x3a4 <__udivmodsi4_ep>
+ 39c:	a2 1b       	sub	r26, r18
+ 39e:	b3 0b       	sbc	r27, r19
+ 3a0:	e4 0b       	sbc	r30, r20
+ 3a2:	f5 0b       	sbc	r31, r21
+
+000003a4 <__udivmodsi4_ep>:
+ 3a4:	66 1f       	adc	r22, r22
+ 3a6:	77 1f       	adc	r23, r23
+ 3a8:	88 1f       	adc	r24, r24
+ 3aa:	99 1f       	adc	r25, r25
+ 3ac:	1a 94       	dec	r1
+ 3ae:	69 f7       	brne	.-38     	; 0x38a <__udivmodsi4_loop>
+ 3b0:	60 95       	com	r22
+ 3b2:	70 95       	com	r23
+ 3b4:	80 95       	com	r24
+ 3b6:	90 95       	com	r25
+ 3b8:	9b 01       	movw	r18, r22
+ 3ba:	ac 01       	movw	r20, r24
+ 3bc:	bd 01       	movw	r22, r26
+ 3be:	cf 01       	movw	r24, r30
+ 3c0:	08 95       	ret
+
+000003c2 <__divmodsi4>:
+ 3c2:	97 fb       	bst	r25, 7
+ 3c4:	09 2e       	mov	r0, r25
+ 3c6:	05 26       	eor	r0, r21
+ 3c8:	0e d0       	rcall	.+28     	; 0x3e6 <__divmodsi4_neg1>
+ 3ca:	57 fd       	sbrc	r21, 7
+ 3cc:	04 d0       	rcall	.+8      	; 0x3d6 <__divmodsi4_neg2>
+ 3ce:	d7 df       	rcall	.-82     	; 0x37e <__udivmodsi4>
+ 3d0:	0a d0       	rcall	.+20     	; 0x3e6 <__divmodsi4_neg1>
+ 3d2:	00 1c       	adc	r0, r0
+ 3d4:	38 f4       	brcc	.+14     	; 0x3e4 <__divmodsi4_exit>
+
+000003d6 <__divmodsi4_neg2>:
+ 3d6:	50 95       	com	r21
+ 3d8:	40 95       	com	r20
+ 3da:	30 95       	com	r19
+ 3dc:	21 95       	neg	r18
+ 3de:	3f 4f       	sbci	r19, 0xFF	; 255
+ 3e0:	4f 4f       	sbci	r20, 0xFF	; 255
+ 3e2:	5f 4f       	sbci	r21, 0xFF	; 255
+
+000003e4 <__divmodsi4_exit>:
+ 3e4:	08 95       	ret
+
+000003e6 <__divmodsi4_neg1>:
+ 3e6:	f6 f7       	brtc	.-4      	; 0x3e4 <__divmodsi4_exit>
+ 3e8:	90 95       	com	r25
+ 3ea:	80 95       	com	r24
+ 3ec:	70 95       	com	r23
+ 3ee:	61 95       	neg	r22
+ 3f0:	7f 4f       	sbci	r23, 0xFF	; 255
+ 3f2:	8f 4f       	sbci	r24, 0xFF	; 255
+ 3f4:	9f 4f       	sbci	r25, 0xFF	; 255
+ 3f6:	08 95       	ret
+
+000003f8 <_exit>:
+ 3f8:	f8 94       	cli
+
+000003fa <__stop_program>:
+ 3fa:	ff cf       	rjmp	.-2      	; 0x3fa <__stop_program>
