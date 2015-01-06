@@ -28,7 +28,7 @@ cls
 REM @SET CAL_FUSES=99e4
 @SET CAL_FUSES=FF4A
 @SET CUSTOMERCODE="bms.hex"
-@SET CALIBRATECODE="z:\dokumenti\Smart-electro.net\GitHub\BMS_SLAVE_V2.0\Software\AtTiny_programmer\rc_calib_1200Khz.hex"
+@SET CALIBRATECODE="rc_calib_1200Khz.hex"
 
 
 %TOOL% -cUSB -I125000 -d%CPU% -s -f%CAL_FUSES% -e -pf -if%CALIBRATECODE%

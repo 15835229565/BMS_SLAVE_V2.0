@@ -1,42 +1,42 @@
 Archive member included because of file (symbol)
 
-c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_mulsi3.o)
-                              BMS_Slave_V2.0.o (__mulsi3)
-c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_udivmodsi4.o)
+c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_mulhi3.o)
+                              BMS_Slave_V2.0.o (__mulhi3)
+c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_udivmodsi4.o)
                               BMS_Slave_V2.0.o (__udivmodsi4)
-c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_divmodsi4.o)
+c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_divmodsi4.o)
                               BMS_Slave_V2.0.o (__divmodsi4)
-c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_exit.o)
-                              c:/winavr/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr25/crttn13a.o (exit)
-c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_clear_bss.o)
+c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_exit.o)
+                              c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr25/crttn13a.o (exit)
+c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_clear_bss.o)
                               BMS_Slave_V2.0.o (__do_clear_bss)
 
 Discarded input sections
 
- .data          0x00000000        0x0 c:/winavr/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr25/crttn13a.o
- .bss           0x00000000        0x0 c:/winavr/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr25/crttn13a.o
+ .data          0x00000000        0x0 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr25/crttn13a.o
+ .bss           0x00000000        0x0 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr25/crttn13a.o
  .text          0x00000000        0x0 BMS_Slave_V2.0.o
  .data          0x00000000        0x0 BMS_Slave_V2.0.o
  .bss           0x00000000        0x0 BMS_Slave_V2.0.o
  .text.EEPROM_read
                 0x00000000        0x0 BMS_Slave_V2.0.o
- .text          0x00000000        0x0 c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_mulsi3.o)
- .data          0x00000000        0x0 c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_mulsi3.o)
- .bss           0x00000000        0x0 c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_mulsi3.o)
- .text          0x00000000        0x0 c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_udivmodsi4.o)
- .data          0x00000000        0x0 c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_udivmodsi4.o)
- .bss           0x00000000        0x0 c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_udivmodsi4.o)
- .text          0x00000000        0x0 c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_divmodsi4.o)
- .data          0x00000000        0x0 c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_divmodsi4.o)
- .bss           0x00000000        0x0 c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_divmodsi4.o)
- .text          0x00000000        0x0 c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_exit.o)
- .data          0x00000000        0x0 c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_exit.o)
- .bss           0x00000000        0x0 c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_exit.o)
- .text.libgcc   0x00000000        0x0 c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_exit.o)
- .text          0x00000000        0x0 c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_clear_bss.o)
- .data          0x00000000        0x0 c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_clear_bss.o)
- .bss           0x00000000        0x0 c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_clear_bss.o)
- .text.libgcc   0x00000000        0x0 c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_clear_bss.o)
+ .text          0x00000000        0x0 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_mulhi3.o)
+ .data          0x00000000        0x0 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_mulhi3.o)
+ .bss           0x00000000        0x0 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_mulhi3.o)
+ .text          0x00000000        0x0 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_udivmodsi4.o)
+ .data          0x00000000        0x0 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_udivmodsi4.o)
+ .bss           0x00000000        0x0 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_udivmodsi4.o)
+ .text          0x00000000        0x0 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_divmodsi4.o)
+ .data          0x00000000        0x0 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_divmodsi4.o)
+ .bss           0x00000000        0x0 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_divmodsi4.o)
+ .text          0x00000000        0x0 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_exit.o)
+ .data          0x00000000        0x0 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_exit.o)
+ .bss           0x00000000        0x0 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_exit.o)
+ .text.libgcc   0x00000000        0x0 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_exit.o)
+ .text          0x00000000        0x0 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_clear_bss.o)
+ .data          0x00000000        0x0 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_clear_bss.o)
+ .bss           0x00000000        0x0 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_clear_bss.o)
+ .text.libgcc   0x00000000        0x0 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_clear_bss.o)
 
 Memory Configuration
 
@@ -51,13 +51,13 @@ signature        0x00840000         0x00000400         rw !x
 
 Linker script and memory map
 
-LOAD c:/winavr/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr25/crttn13a.o
+LOAD c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr25/crttn13a.o
 LOAD BMS_Slave_V2.0.o
 START GROUP
 END GROUP
-LOAD c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a
-LOAD c:/winavr/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr25\libc.a
-LOAD c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a
+LOAD c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a
+LOAD c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr25\libc.a
+LOAD c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a
 
 .hash
  *(.hash)
@@ -149,9 +149,9 @@ LOAD c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000      0x3fc
+.text           0x00000000      0x3f8
  *(.vectors)
- .vectors       0x00000000       0x14 c:/winavr/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr25/crttn13a.o
+ .vectors       0x00000000       0x14 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr25/crttn13a.o
                 0x00000000                __vectors
                 0x00000000                __vector_default
  *(.vectors)
@@ -176,18 +176,18 @@ LOAD c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a
  SORT(*)(.ctors)
  SORT(*)(.dtors)
  *(.init0)
- .init0         0x00000014        0x0 c:/winavr/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr25/crttn13a.o
+ .init0         0x00000014        0x0 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr25/crttn13a.o
                 0x00000014                __init
  *(.init0)
  *(.init1)
  *(.init1)
  *(.init2)
- .init2         0x00000014        0x8 c:/winavr/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr25/crttn13a.o
+ .init2         0x00000014        0x8 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr25/crttn13a.o
  *(.init2)
  *(.init3)
  *(.init3)
  *(.init4)
- .init4         0x0000001c       0x10 c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_clear_bss.o)
+ .init4         0x0000001c       0x10 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_clear_bss.o)
                 0x0000001c                __do_clear_bss
  *(.init4)
  *(.init5)
@@ -199,10 +199,10 @@ LOAD c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a
  *(.init8)
  *(.init8)
  *(.init9)
- .init9         0x0000002c        0x4 c:/winavr/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr25/crttn13a.o
+ .init9         0x0000002c        0x4 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr25/crttn13a.o
  *(.init9)
  *(.text)
- .text          0x00000030        0x2 c:/winavr/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr25/crttn13a.o
+ .text          0x00000030        0x2 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr25/crttn13a.o
                 0x00000030                __vector_1
                 0x00000030                __bad_interrupt
                 0x00000030                __vector_3
@@ -228,19 +228,19 @@ LOAD c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a
  .text.EEPROM_write
                 0x00000128       0x10 BMS_Slave_V2.0.o
                 0x00000128                EEPROM_write
- .text.main     0x00000138      0x214 BMS_Slave_V2.0.o
+ .text.main     0x00000138      0x21e BMS_Slave_V2.0.o
                 0x00000138                main
- .text.libgcc   0x0000034c       0x32 c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_mulsi3.o)
-                0x0000034c                __mulsi3
- .text.libgcc   0x0000037e       0x44 c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_udivmodsi4.o)
-                0x0000037e                __udivmodsi4
- .text.libgcc   0x000003c2       0x36 c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_divmodsi4.o)
-                0x000003c2                __divmodsi4
-                0x000003f8                . = ALIGN (0x2)
+ .text.libgcc   0x00000356       0x24 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_mulhi3.o)
+                0x00000356                __mulhi3
+ .text.libgcc   0x0000037a       0x44 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_udivmodsi4.o)
+                0x0000037a                __udivmodsi4
+ .text.libgcc   0x000003be       0x36 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_divmodsi4.o)
+                0x000003be                __divmodsi4
+                0x000003f4                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x000003f8        0x0 c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_exit.o)
-                0x000003f8                exit
-                0x000003f8                _exit
+ .fini9         0x000003f4        0x0 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_exit.o)
+                0x000003f4                exit
+                0x000003f4                _exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -259,11 +259,11 @@ LOAD c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x000003f8        0x4 c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_exit.o)
+ .fini0         0x000003f4        0x4 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a(_exit.o)
  *(.fini0)
-                0x000003fc                _etext = .
+                0x000003f8                _etext = .
 
-.data           0x00800060        0x0 load address 0x000003fc
+.data           0x00800060        0x0 load address 0x000003f8
                 0x00800060                PROVIDE (__data_start, .)
  *(.data)
  *(.data*)
@@ -294,8 +294,8 @@ LOAD c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a
                 0x00800067        0x2 BMS_Slave_V2.0.o
  *(COMMON)
                 0x00800069                PROVIDE (__bss_end, .)
-                0x000003fc                __data_load_start = LOADADDR (.data)
-                0x000003fc                __data_load_end = (__data_load_start + SIZEOF (.data))
+                0x000003f8                __data_load_start = LOADADDR (.data)
+                0x000003f8                __data_load_end = (__data_load_start + SIZEOF (.data))
 
 .noinit         0x00800069        0x0
                 0x00800069                PROVIDE (__noinit_start, .)
@@ -364,27 +364,27 @@ LOAD c:/winavr/bin/../lib/gcc/avr/4.3.3/avr25\libgcc.a
  .debug_pubnames
                 0x00000000       0x9c BMS_Slave_V2.0.o
 
-.debug_info     0x00000000      0x307
+.debug_info     0x00000000      0x324
  *(.debug_info)
- .debug_info    0x00000000      0x307 BMS_Slave_V2.0.o
+ .debug_info    0x00000000      0x324 BMS_Slave_V2.0.o
  *(.gnu.linkonce.wi.*)
 
-.debug_abbrev   0x00000000      0x19f
+.debug_abbrev   0x00000000      0x1b3
  *(.debug_abbrev)
- .debug_abbrev  0x00000000      0x19f BMS_Slave_V2.0.o
+ .debug_abbrev  0x00000000      0x1b3 BMS_Slave_V2.0.o
 
-.debug_line     0x00000000      0x4a8
+.debug_line     0x00000000      0x4c2
  *(.debug_line)
- .debug_line    0x00000000      0x4a8 BMS_Slave_V2.0.o
+ .debug_line    0x00000000      0x4c2 BMS_Slave_V2.0.o
 
 .debug_frame    0x00000000       0x80
  *(.debug_frame)
  .debug_frame   0x00000000       0x80 BMS_Slave_V2.0.o
 
-.debug_str      0x00000000      0x1b6
+.debug_str      0x00000000      0x1a1
  *(.debug_str)
- .debug_str     0x00000000      0x1b6 BMS_Slave_V2.0.o
-                                0x1ef (size before relaxing)
+ .debug_str     0x00000000      0x1a1 BMS_Slave_V2.0.o
+                                0x1da (size before relaxing)
 
 .debug_loc      0x00000000      0x1c9
  *(.debug_loc)

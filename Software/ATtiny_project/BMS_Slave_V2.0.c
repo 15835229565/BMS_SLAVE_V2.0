@@ -27,16 +27,16 @@
 // Voltage settings for different battery types
 /*****************************************************/
 // Programming voltage for ACD calibration [0.01V]
-#define BMS_programm_voltage (3750)
+#define BMS_programm_voltage (4200)
 
 // maximum alowable voltage of cell.
-#define Li_Max (3950)
+#define Li_Max (4250)
 
 // optimum full voltage. At this value BMS will start PWM on bypass transistor
-#define Li_Full (3750) // mV
+#define Li_Full (4200) // mV
 
 // minimum cell voltage
-#define Li_Min  (2800)
+#define Li_Min  (3000)
 
 /*****************************************************/
 
@@ -66,14 +66,15 @@
 #define F_CPU 1200000
 
 //#define TIMERTOP (F_CPU/SOFTUART_PRESCALE/SOFTUART_BAUD_RATE/3 -1)
-#define TIMERTOP (F_CPU/SOFTUART_PRESCALE/SOFTUART_BAUD_RATE/6 -1) // Corect PWM
+//#define TIMERTOP (F_CPU/SOFTUART_PRESCALE/SOFTUART_BAUD_RATE/6 -1) // Correct PWM
+#define TIMERTOP (165)
 #define TX_NUM_OF_BITS (10)
 #define SU_TRUE 1
 #define SU_FALSE 0
 
 #define SOFTUART_TXPORT  PORTB
 #define SOFTUART_TXDDR   DDRB
-#define SOFTUART_TXBIT   PB2
+#define SOFTUART_TXBIT   PB4
 
 volatile static unsigned char  flag_tx_ready;
 volatile static unsigned char  timer_tx_ctr;
@@ -84,18 +85,18 @@ volatile static unsigned short internal_tx_buffer; /* ! mt: was type uchar - thi
 #define set_tx_pin_low()  (SOFTUART_TXPORT CLR (1<<SOFTUART_TXBIT))
 
 
-#define BATTERY_OVER   PB0
-#define BATTERY_UNDER  PB4
+//#define BATTERY_OVER   PB0
+//#define BATTERY_UNDER  PB4
 
-#define set_over_pin()  (PORTB SET (1<<BATTERY_OVER))
-#define clr_over_pin()  (PORTB CLR (1<<BATTERY_OVER))
-#define set_under_pin() (PORTB SET (1<<BATTERY_UNDER))
-#define clr_under_pin() (PORTB CLR (1<<BATTERY_UNDER))
+//#define set_over_pin()  (PORTB SET (1<<BATTERY_OVER))
+//#define clr_over_pin()  (PORTB CLR (1<<BATTERY_OVER))
+//#define set_under_pin() (PORTB SET (1<<BATTERY_UNDER))
+//#define clr_under_pin() (PORTB CLR (1<<BATTERY_UNDER))
 
 //volatile static unsigned short ADC_result;
 
 
-#define EE_COMM 0
+//#define EE_COMM 0
 // eeoprom calibration values
 #define EE_OSZI 0 //clock calibration (calibrate from programmer)
 #define EE_ADC_CALIBRATED 1
@@ -220,25 +221,7 @@ void adc_init()
 	// ADCSRA SET (1<<ADSC);     // START ACD
 }
 
-static void timer_init(void)
-{
-	unsigned char sreg_tmp;
-	
-	sreg_tmp = SREG;
-	cli();
-	CLKPR=0b10000011;			//system clock prescaler by 8
-	OCR0A = TIMERTOP;          /* set top */
-	OCR0B = 0;                 /* set PWM-B */
 
-	TCCR0A = PRESC_MASKA | (1<<WGM00) | (1<<COM0B1) | (0<<COM0B0);
-	TCCR0B = PRESC_MASKB | (1<<WGM02);
-
-	TIMSK0 |= CMPINT_EN_MASK;
-
-	TCNT0 = 0;                 /* reset counter */
-	
-	SREG = sreg_tmp;
-}
 
 
 // EEPROM
@@ -285,14 +268,35 @@ unsigned char EEPROM_read(unsigned char ucAddress)
 		return(55 + tp_bits);
 	}
 }*/
+static void timer_init(void)
+{
+	unsigned char sreg_tmp;
+	
+	sreg_tmp = SREG;
+	cli();
+	CLKPR=0b10000011;			//system clock prescaler by 8
+	OCR0A = TIMERTOP;          /* set top */
+	OCR0B = 0;                 /* set PWM-B */
 
+	TCCR0A = PRESC_MASKA | (1<<WGM00) | (1<<COM0B1) | (0<<COM0B0);
+	TCCR0B = PRESC_MASKB | (1<<WGM02);
+
+	TIMSK0 |= CMPINT_EN_MASK;
+
+	TCNT0 = 0;                 /* reset counter */
+	
+	SREG = sreg_tmp;
+	
+	//read RC calibration
+	OSCCAL = EEPROM_read(EE_OSZI);
+}
 // MAIN
 int main(void)
 {
 	volatile unsigned char ad_H, ad_L;
 	volatile unsigned short ADC_result;
 
-	char Bat_status; 
+	char Bat_status=0; 
 	unsigned long miliVolt=0;
 	unsigned short RefVolt;
 	wdt_enable(WDTO_2S);       // Set WDT for 2sek
@@ -302,8 +306,8 @@ int main(void)
 	DDRB = 0x37;
 	
 	//comm_mode = EEPROM_read(EE_COMM);
-	set_over_pin();
-	set_under_pin();
+	//set_over_pin();
+	//set_under_pin();
 
 	flag_tx_ready = SU_FALSE;
 	set_tx_pin_high();                   // mt: set to high to avoid garbage on init
@@ -354,7 +358,8 @@ int main(void)
 			//voltage in milivolts = ADCvalue*ProgrammingVoltage/EEPROMreference
 			ADC_result = (ad_H << 8) + ad_L; // AD value
 	
-			miliVolt = (ADC_result * (long)BMS_programm_voltage)/(long)RefVolt;		
+			//miliVolt = (ADC_result * (long)BMS_programm_voltage) / (long)RefVolt;
+			miliVolt = (long)(ADC_result * BMS_programm_voltage) / (long)RefVolt;
 			
 
 			//Bat_status = 'N';
@@ -401,15 +406,15 @@ int main(void)
 				}
 			}
 			
-/*
-			//Battery undrewoltage. Set warning.
-			if (miliVolt < Li_Min)
+
+			//Battery undrevoltage. Set warning.
+/*			if (miliVolt < Li_Min)
 			{
 				Bat_status = 'M';
 				//clr_under_pin();
 				//set_over_pin();  //optocoupler signaling
 			}
-			*/
+	*/		
 
 			// send to UART
 			//miliVolt=0xAABB;
@@ -422,7 +427,7 @@ int main(void)
 			softuart_putchar((miliVolt & 0x000000FFL));      // Apply the low byte of the data 
 			
 			
-			softuart_putchar(0);
+			softuart_putchar(OCR0B);
 			softuart_putchar('\r');
 			softuart_putchar('\0');
 

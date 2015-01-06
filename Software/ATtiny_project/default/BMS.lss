@@ -3,27 +3,27 @@ BMS.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .text         000003fc  00000000  00000000  00000074  2**1
+  0 .text         000003f8  00000000  00000000  00000074  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .bss          00000009  00800060  00800060  00000470  2**0
+  1 .bss          00000009  00800060  00800060  0000046c  2**0
                   ALLOC
-  2 .debug_aranges 00000050  00000000  00000000  00000470  2**0
+  2 .debug_aranges 00000050  00000000  00000000  0000046c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  3 .debug_pubnames 0000009c  00000000  00000000  000004c0  2**0
+  3 .debug_pubnames 0000009c  00000000  00000000  000004bc  2**0
                   CONTENTS, READONLY, DEBUGGING
-  4 .debug_info   00000307  00000000  00000000  0000055c  2**0
+  4 .debug_info   00000324  00000000  00000000  00000558  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_abbrev 0000019f  00000000  00000000  00000863  2**0
+  5 .debug_abbrev 000001b3  00000000  00000000  0000087c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_line   000004a8  00000000  00000000  00000a02  2**0
+  6 .debug_line   000004c2  00000000  00000000  00000a2f  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_frame  00000080  00000000  00000000  00000eac  2**2
+  7 .debug_frame  00000080  00000000  00000000  00000ef4  2**2
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_str    000001b6  00000000  00000000  00000f2c  2**0
+  8 .debug_str    000001a1  00000000  00000000  00000f74  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_loc    000001c9  00000000  00000000  000010e2  2**0
+  9 .debug_loc    000001c9  00000000  00000000  00001115  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_ranges 00000048  00000000  00000000  000012ab  2**0
+ 10 .debug_ranges 00000048  00000000  00000000  000012de  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -66,7 +66,7 @@ unsigned char EEPROM_read(unsigned char ucAddress)
   28:	b1 07       	cpc	r27, r17
   2a:	e1 f7       	brne	.-8      	; 0x24 <.do_clear_bss_loop>
   2c:	85 d0       	rcall	.+266    	; 0x138 <main>
-  2e:	e4 c1       	rjmp	.+968    	; 0x3f8 <_exit>
+  2e:	e2 c1       	rjmp	.+964    	; 0x3f4 <_exit>
 
 00000030 <__bad_interrupt>:
   30:	e7 cf       	rjmp	.-50     	; 0x0 <__vectors>
@@ -105,14 +105,14 @@ ISR(TIM0_COMPA_vect)
   5a:	02 c0       	rjmp	.+4      	; 0x60 <__SREG__+0x21>
 			{
 				set_tx_pin_high();
-  5c:	c2 9a       	sbi	0x18, 2	; 24
+  5c:	c4 9a       	sbi	0x18, 4	; 24
   5e:	01 c0       	rjmp	.+2      	; 0x62 <__SREG__+0x23>
 				//set_tx_pin_low();
 			}
 			else
 			{
 				set_tx_pin_low();
-  60:	c2 98       	cbi	0x18, 2	; 24
+  60:	c4 98       	cbi	0x18, 4	; 24
 				//set_tx_pin_high();
 			}
 			internal_tx_buffer >>= 1;
@@ -294,9 +294,9 @@ void EEPROM_write(unsigned char ucAddress, unsigned char ucData)
  136:	08 95       	ret
 
 00000138 <main>:
-	}
-}*/
-
+	//read RC calibration
+	OSCCAL = EEPROM_read(EE_OSZI);
+}
 // MAIN
 int main(void)
 {
@@ -324,7 +324,7 @@ int main(void)
  162:	de b7       	in	r29, 0x3e	; 62
 	volatile unsigned short ADC_result;
 
-	char Bat_status; 
+	char Bat_status=0; 
 	unsigned long miliVolt=0;
 	unsigned short RefVolt;
 	wdt_enable(WDTO_2S);       // Set WDT for 2sek
@@ -346,545 +346,562 @@ int main(void)
  17a:	87 bb       	out	0x17, r24	; 23
 	
 	//comm_mode = EEPROM_read(EE_COMM);
-	set_over_pin();
- 17c:	c0 9a       	sbi	0x18, 0	; 24
-	set_under_pin();
- 17e:	c4 9a       	sbi	0x18, 4	; 24
+	//set_over_pin();
+	//set_under_pin();
 
 	flag_tx_ready = SU_FALSE;
- 180:	10 92 64 00 	sts	0x0064, r1
+ 17c:	10 92 64 00 	sts	0x0064, r1
 	set_tx_pin_high();                   // mt: set to high to avoid garbage on init
- 184:	c2 9a       	sbi	0x18, 2	; 24
+ 180:	c4 9a       	sbi	0x18, 4	; 24
 
 	ADC_done = 0;
- 186:	10 92 62 00 	sts	0x0062, r1
+ 182:	10 92 62 00 	sts	0x0062, r1
 	ADC_go = 0;
- 18a:	10 92 63 00 	sts	0x0063, r1
+ 186:	10 92 63 00 	sts	0x0063, r1
 
 	adc_init();
- 18e:	bf df       	rcall	.-130    	; 0x10e <adc_init>
-
+ 18a:	c1 df       	rcall	.-126    	; 0x10e <adc_init>
+}*/
 static void timer_init(void)
 {
 	unsigned char sreg_tmp;
 	
 	sreg_tmp = SREG;
- 190:	9f b7       	in	r25, 0x3f	; 63
+ 18c:	9f b7       	in	r25, 0x3f	; 63
 	cli();
- 192:	f8 94       	cli
+ 18e:	f8 94       	cli
 	CLKPR=0b10000011;			//system clock prescaler by 8
- 194:	83 e8       	ldi	r24, 0x83	; 131
- 196:	86 bd       	out	0x26, r24	; 38
+ 190:	83 e8       	ldi	r24, 0x83	; 131
+ 192:	86 bd       	out	0x26, r24	; 38
 	OCR0A = TIMERTOP;          /* set top */
- 198:	85 ea       	ldi	r24, 0xA5	; 165
- 19a:	86 bf       	out	0x36, r24	; 54
+ 194:	85 ea       	ldi	r24, 0xA5	; 165
+ 196:	86 bf       	out	0x36, r24	; 54
 	OCR0B = 0;                 /* set PWM-B */
- 19c:	19 bc       	out	0x29, r1	; 41
+ 198:	19 bc       	out	0x29, r1	; 41
 
 	TCCR0A = PRESC_MASKA | (1<<WGM00) | (1<<COM0B1) | (0<<COM0B0);
- 19e:	81 e2       	ldi	r24, 0x21	; 33
- 1a0:	8f bd       	out	0x2f, r24	; 47
+ 19a:	81 e2       	ldi	r24, 0x21	; 33
+ 19c:	8f bd       	out	0x2f, r24	; 47
 	TCCR0B = PRESC_MASKB | (1<<WGM02);
- 1a2:	89 e0       	ldi	r24, 0x09	; 9
- 1a4:	83 bf       	out	0x33, r24	; 51
+ 19e:	89 e0       	ldi	r24, 0x09	; 9
+ 1a0:	83 bf       	out	0x33, r24	; 51
 
 	TIMSK0 |= CMPINT_EN_MASK;
- 1a6:	89 b7       	in	r24, 0x39	; 57
- 1a8:	84 60       	ori	r24, 0x04	; 4
- 1aa:	89 bf       	out	0x39, r24	; 57
+ 1a2:	89 b7       	in	r24, 0x39	; 57
+ 1a4:	84 60       	ori	r24, 0x04	; 4
+ 1a6:	89 bf       	out	0x39, r24	; 57
 
 	TCNT0 = 0;                 /* reset counter */
- 1ac:	12 be       	out	0x32, r1	; 50
+ 1a8:	12 be       	out	0x32, r1	; 50
 	
 	SREG = sreg_tmp;
- 1ae:	9f bf       	out	0x3f, r25	; 63
+ 1aa:	9f bf       	out	0x3f, r25	; 63
 }
 
 unsigned char EEPROM_read(unsigned char ucAddress)
 {
 
 	while(EECR & (1<<EEWE));             // Wait for completion of previous write
- 1b0:	e1 99       	sbic	0x1c, 1	; 28
- 1b2:	fe cf       	rjmp	.-4      	; 0x1b0 <main+0x78>
+ 1ac:	e1 99       	sbic	0x1c, 1	; 28
+ 1ae:	fe cf       	rjmp	.-4      	; 0x1ac <main+0x74>
 
 	EEARL = ucAddress;                   // Set up address register
- 1b4:	81 e0       	ldi	r24, 0x01	; 1
- 1b6:	8e bb       	out	0x1e, r24	; 30
+ 1b0:	1e ba       	out	0x1e, r1	; 30
 
 	EECR |= (1<<EERE);                   // Start eeprom read by writing EERE
- 1b8:	e0 9a       	sbi	0x1c, 0	; 28
+ 1b2:	e0 9a       	sbi	0x1c, 0	; 28
 
 	return EEDR;                         // Return data from data register
- 1ba:	8d b3       	in	r24, 0x1d	; 29
+ 1b4:	8d b3       	in	r24, 0x1d	; 29
+	TCNT0 = 0;                 /* reset counter */
+	
+	SREG = sreg_tmp;
+	
+	//read RC calibration
+	OSCCAL = EEPROM_read(EE_OSZI);
+ 1b6:	81 bf       	out	0x31, r24	; 49
+}
+
+unsigned char EEPROM_read(unsigned char ucAddress)
+{
+
+	while(EECR & (1<<EEWE));             // Wait for completion of previous write
+ 1b8:	e1 99       	sbic	0x1c, 1	; 28
+ 1ba:	fe cf       	rjmp	.-4      	; 0x1b8 <main+0x80>
+
+	EEARL = ucAddress;                   // Set up address register
+ 1bc:	81 e0       	ldi	r24, 0x01	; 1
+ 1be:	8e bb       	out	0x1e, r24	; 30
+
+	EECR |= (1<<EERE);                   // Start eeprom read by writing EERE
+ 1c0:	e0 9a       	sbi	0x1c, 0	; 28
+
+	return EEDR;                         // Return data from data register
+ 1c2:	8d b3       	in	r24, 0x1d	; 29
 	ADC_go = 0;
 
 	adc_init();
 	timer_init();
 	//read ADC calibration values from EEPROM if BMS was already calibrated
 	if (EEPROM_read(EE_ADC_CALIBRATED)==1){
- 1bc:	81 30       	cpi	r24, 0x01	; 1
- 1be:	b1 f4       	brne	.+44     	; 0x1ec <main+0xb4>
+ 1c4:	81 30       	cpi	r24, 0x01	; 1
+ 1c6:	b1 f4       	brne	.+44     	; 0x1f4 <main+0xbc>
 }
 
 unsigned char EEPROM_read(unsigned char ucAddress)
 {
 
 	while(EECR & (1<<EEWE));             // Wait for completion of previous write
- 1c0:	e1 99       	sbic	0x1c, 1	; 28
- 1c2:	fe cf       	rjmp	.-4      	; 0x1c0 <main+0x88>
+ 1c8:	e1 99       	sbic	0x1c, 1	; 28
+ 1ca:	fe cf       	rjmp	.-4      	; 0x1c8 <main+0x90>
 
 	EEARL = ucAddress;                   // Set up address register
- 1c4:	82 e0       	ldi	r24, 0x02	; 2
- 1c6:	8e bb       	out	0x1e, r24	; 30
+ 1cc:	82 e0       	ldi	r24, 0x02	; 2
+ 1ce:	8e bb       	out	0x1e, r24	; 30
 
 	EECR |= (1<<EERE);                   // Start eeprom read by writing EERE
- 1c8:	e0 9a       	sbi	0x1c, 0	; 28
+ 1d0:	e0 9a       	sbi	0x1c, 0	; 28
 
 	return EEDR;                         // Return data from data register
- 1ca:	8d b3       	in	r24, 0x1d	; 29
+ 1d2:	8d b3       	in	r24, 0x1d	; 29
 
 	adc_init();
 	timer_init();
 	//read ADC calibration values from EEPROM if BMS was already calibrated
 	if (EEPROM_read(EE_ADC_CALIBRATED)==1){
 		ad_H = EEPROM_read(EE_ADC_HI); //ADC calibration value
- 1cc:	89 83       	std	Y+1, r24	; 0x01
+ 1d4:	89 83       	std	Y+1, r24	; 0x01
 }
 
 unsigned char EEPROM_read(unsigned char ucAddress)
 {
 
 	while(EECR & (1<<EEWE));             // Wait for completion of previous write
- 1ce:	e1 99       	sbic	0x1c, 1	; 28
- 1d0:	fe cf       	rjmp	.-4      	; 0x1ce <main+0x96>
+ 1d6:	e1 99       	sbic	0x1c, 1	; 28
+ 1d8:	fe cf       	rjmp	.-4      	; 0x1d6 <main+0x9e>
 
 	EEARL = ucAddress;                   // Set up address register
- 1d2:	83 e0       	ldi	r24, 0x03	; 3
- 1d4:	8e bb       	out	0x1e, r24	; 30
+ 1da:	83 e0       	ldi	r24, 0x03	; 3
+ 1dc:	8e bb       	out	0x1e, r24	; 30
 
 	EECR |= (1<<EERE);                   // Start eeprom read by writing EERE
- 1d6:	e0 9a       	sbi	0x1c, 0	; 28
+ 1de:	e0 9a       	sbi	0x1c, 0	; 28
 
 	return EEDR;                         // Return data from data register
- 1d8:	8d b3       	in	r24, 0x1d	; 29
+ 1e0:	8d b3       	in	r24, 0x1d	; 29
 	adc_init();
 	timer_init();
 	//read ADC calibration values from EEPROM if BMS was already calibrated
 	if (EEPROM_read(EE_ADC_CALIBRATED)==1){
 		ad_H = EEPROM_read(EE_ADC_HI); //ADC calibration value
 		ad_L = EEPROM_read(EE_ADC_LO);
- 1da:	8a 83       	std	Y+2, r24	; 0x02
+ 1e2:	8a 83       	std	Y+2, r24	; 0x02
 		RefVolt=(ad_H << 8) + ad_L;
- 1dc:	29 81       	ldd	r18, Y+1	; 0x01
- 1de:	3a 81       	ldd	r19, Y+2	; 0x02
- 1e0:	92 2f       	mov	r25, r18
- 1e2:	80 e0       	ldi	r24, 0x00	; 0
- 1e4:	6c 01       	movw	r12, r24
- 1e6:	c3 0e       	add	r12, r19
- 1e8:	d1 1c       	adc	r13, r1
- 1ea:	36 c0       	rjmp	.+108    	; 0x258 <main+0x120>
- 1ec:	40 e0       	ldi	r20, 0x00	; 0
- 1ee:	50 e0       	ldi	r21, 0x00	; 0
- 1f0:	60 e0       	ldi	r22, 0x00	; 0
- 1f2:	70 e0       	ldi	r23, 0x00	; 0
- 1f4:	e0 e0       	ldi	r30, 0x00	; 0
- 1f6:	f0 e0       	ldi	r31, 0x00	; 0
+ 1e4:	29 81       	ldd	r18, Y+1	; 0x01
+ 1e6:	3a 81       	ldd	r19, Y+2	; 0x02
+ 1e8:	92 2f       	mov	r25, r18
+ 1ea:	80 e0       	ldi	r24, 0x00	; 0
+ 1ec:	5c 01       	movw	r10, r24
+ 1ee:	a3 0e       	add	r10, r19
+ 1f0:	b1 1c       	adc	r11, r1
+ 1f2:	36 c0       	rjmp	.+108    	; 0x260 <main+0x128>
+ 1f4:	40 e0       	ldi	r20, 0x00	; 0
+ 1f6:	50 e0       	ldi	r21, 0x00	; 0
+ 1f8:	60 e0       	ldi	r22, 0x00	; 0
+ 1fa:	70 e0       	ldi	r23, 0x00	; 0
+ 1fc:	e0 e0       	ldi	r30, 0x00	; 0
+ 1fe:	f0 e0       	ldi	r31, 0x00	; 0
 	}else{
 		//take 10 measurements
 		for (int i=0; i<10; i++){
 			ADCSRA SET (1<<ADSC);             // START ACDC
- 1f8:	36 9a       	sbi	0x06, 6	; 6
+ 200:	36 9a       	sbi	0x06, 6	; 6
 			while( ADCSRA & (1<<ADSC) ) {}    // Pool ADC
- 1fa:	36 99       	sbic	0x06, 6	; 6
- 1fc:	fe cf       	rjmp	.-4      	; 0x1fa <main+0xc2>
+ 202:	36 99       	sbic	0x06, 6	; 6
+ 204:	fe cf       	rjmp	.-4      	; 0x202 <main+0xca>
 			ad_L = ADCL;
- 1fe:	84 b1       	in	r24, 0x04	; 4
- 200:	8a 83       	std	Y+2, r24	; 0x02
+ 206:	84 b1       	in	r24, 0x04	; 4
+ 208:	8a 83       	std	Y+2, r24	; 0x02
 			ad_H = ADCH;
- 202:	85 b1       	in	r24, 0x05	; 5
- 204:	89 83       	std	Y+1, r24	; 0x01
+ 20a:	85 b1       	in	r24, 0x05	; 5
+ 20c:	89 83       	std	Y+1, r24	; 0x01
 			miliVolt+=(ad_H << 8) + ad_L;
- 206:	89 81       	ldd	r24, Y+1	; 0x01
- 208:	9a 81       	ldd	r25, Y+2	; 0x02
- 20a:	38 2f       	mov	r19, r24
- 20c:	20 e0       	ldi	r18, 0x00	; 0
- 20e:	d9 01       	movw	r26, r18
- 210:	a9 0f       	add	r26, r25
- 212:	b1 1d       	adc	r27, r1
- 214:	cd 01       	movw	r24, r26
- 216:	aa 27       	eor	r26, r26
- 218:	97 fd       	sbrc	r25, 7
- 21a:	a0 95       	com	r26
- 21c:	ba 2f       	mov	r27, r26
- 21e:	48 0f       	add	r20, r24
- 220:	59 1f       	adc	r21, r25
- 222:	6a 1f       	adc	r22, r26
- 224:	7b 1f       	adc	r23, r27
+ 20e:	89 81       	ldd	r24, Y+1	; 0x01
+ 210:	9a 81       	ldd	r25, Y+2	; 0x02
+ 212:	38 2f       	mov	r19, r24
+ 214:	20 e0       	ldi	r18, 0x00	; 0
+ 216:	d9 01       	movw	r26, r18
+ 218:	a9 0f       	add	r26, r25
+ 21a:	b1 1d       	adc	r27, r1
+ 21c:	cd 01       	movw	r24, r26
+ 21e:	aa 27       	eor	r26, r26
+ 220:	97 fd       	sbrc	r25, 7
+ 222:	a0 95       	com	r26
+ 224:	ba 2f       	mov	r27, r26
+ 226:	48 0f       	add	r20, r24
+ 228:	59 1f       	adc	r21, r25
+ 22a:	6a 1f       	adc	r22, r26
+ 22c:	7b 1f       	adc	r23, r27
 		ad_H = EEPROM_read(EE_ADC_HI); //ADC calibration value
 		ad_L = EEPROM_read(EE_ADC_LO);
 		RefVolt=(ad_H << 8) + ad_L;
 	}else{
 		//take 10 measurements
 		for (int i=0; i<10; i++){
- 226:	31 96       	adiw	r30, 0x01	; 1
- 228:	ea 30       	cpi	r30, 0x0A	; 10
- 22a:	f1 05       	cpc	r31, r1
- 22c:	29 f7       	brne	.-54     	; 0x1f8 <main+0xc0>
+ 22e:	31 96       	adiw	r30, 0x01	; 1
+ 230:	ea 30       	cpi	r30, 0x0A	; 10
+ 232:	f1 05       	cpc	r31, r1
+ 234:	29 f7       	brne	.-54     	; 0x200 <main+0xc8>
 			while( ADCSRA & (1<<ADSC) ) {}    // Pool ADC
 			ad_L = ADCL;
 			ad_H = ADCH;
 			miliVolt+=(ad_H << 8) + ad_L;
 		}
 		miliVolt/=10;
- 22e:	cb 01       	movw	r24, r22
- 230:	ba 01       	movw	r22, r20
- 232:	2a e0       	ldi	r18, 0x0A	; 10
- 234:	30 e0       	ldi	r19, 0x00	; 0
- 236:	40 e0       	ldi	r20, 0x00	; 0
- 238:	50 e0       	ldi	r21, 0x00	; 0
- 23a:	a1 d0       	rcall	.+322    	; 0x37e <__udivmodsi4>
- 23c:	12 2f       	mov	r17, r18
- 23e:	03 2f       	mov	r16, r19
+ 236:	cb 01       	movw	r24, r22
+ 238:	ba 01       	movw	r22, r20
+ 23a:	2a e0       	ldi	r18, 0x0A	; 10
+ 23c:	30 e0       	ldi	r19, 0x00	; 0
+ 23e:	40 e0       	ldi	r20, 0x00	; 0
+ 240:	50 e0       	ldi	r21, 0x00	; 0
+ 242:	9b d0       	rcall	.+310    	; 0x37a <__udivmodsi4>
+ 244:	12 2f       	mov	r17, r18
+ 246:	03 2f       	mov	r16, r19
 		EEPROM_write(EE_ADC_HI, ((miliVolt & 0x0000FF00L) >> 8));
- 240:	82 e0       	ldi	r24, 0x02	; 2
- 242:	63 2f       	mov	r22, r19
- 244:	71 df       	rcall	.-286    	; 0x128 <EEPROM_write>
+ 248:	82 e0       	ldi	r24, 0x02	; 2
+ 24a:	63 2f       	mov	r22, r19
+ 24c:	6d df       	rcall	.-294    	; 0x128 <EEPROM_write>
 		EEPROM_write(EE_ADC_LO, ((miliVolt & 0x000000FFL)));
- 246:	83 e0       	ldi	r24, 0x03	; 3
- 248:	61 2f       	mov	r22, r17
- 24a:	6e df       	rcall	.-292    	; 0x128 <EEPROM_write>
+ 24e:	83 e0       	ldi	r24, 0x03	; 3
+ 250:	61 2f       	mov	r22, r17
+ 252:	6a df       	rcall	.-300    	; 0x128 <EEPROM_write>
 		EEPROM_write(EE_ADC_CALIBRATED, 1);
- 24c:	81 e0       	ldi	r24, 0x01	; 1
- 24e:	61 e0       	ldi	r22, 0x01	; 1
- 250:	6b df       	rcall	.-298    	; 0x128 <EEPROM_write>
+ 254:	81 e0       	ldi	r24, 0x01	; 1
+ 256:	61 e0       	ldi	r22, 0x01	; 1
+ 258:	67 df       	rcall	.-306    	; 0x128 <EEPROM_write>
 		RefVolt=miliVolt;
- 252:	81 2f       	mov	r24, r17
- 254:	90 2f       	mov	r25, r16
- 256:	6c 01       	movw	r12, r24
+ 25a:	81 2f       	mov	r24, r17
+ 25c:	90 2f       	mov	r25, r16
+ 25e:	5c 01       	movw	r10, r24
 	//miliVolt=6990;   //610
 	
 	/*
 	miliVolt*=100; //multiplication before devision to minimize error
 	miliVolt /= BMS_programm_voltage;*/
 	sei();                               // ENABLE interupt
- 258:	78 94       	sei
-			ad_L = ADCL;
+ 260:	78 94       	sei
+ 262:	99 24       	eor	r9, r9
 			ad_H = ADCH;
 			//voltage in milivolts = ADCvalue*ProgrammingVoltage/EEPROMreference
 			ADC_result = (ad_H << 8) + ad_L; // AD value
 	
-			miliVolt = (ADC_result * (long)BMS_programm_voltage)/(long)RefVolt;		
- 25a:	26 01       	movw	r4, r12
- 25c:	66 24       	eor	r6, r6
- 25e:	77 24       	eor	r7, r7
+			//miliVolt = (ADC_result * (long)BMS_programm_voltage) / (long)RefVolt;
+			miliVolt = (long)(ADC_result * BMS_programm_voltage) / (long)RefVolt;
+ 264:	25 01       	movw	r4, r10
+ 266:	66 24       	eor	r6, r6
+ 268:	77 24       	eor	r7, r7
 			// - set status on UART
 			//if ((ADC_result <= RefVolt) && (miliVolt >=Li_Min))
 			if ((ADC_result <= RefVolt))
 			{
 				//if battery is allready full we do some offset for status
 				if(Bat_status=='O' && (ADC_result >= (RefVolt-20))) Bat_status ='O';
- 260:	6c ee       	ldi	r22, 0xEC	; 236
- 262:	26 2e       	mov	r2, r22
- 264:	6f ef       	ldi	r22, 0xFF	; 255
- 266:	36 2e       	mov	r3, r22
- 268:	2c 0c       	add	r2, r12
- 26a:	3d 1c       	adc	r3, r13
+ 26a:	6c ee       	ldi	r22, 0xEC	; 236
+ 26c:	26 2e       	mov	r2, r22
+ 26e:	6f ef       	ldi	r22, 0xFF	; 255
+ 270:	36 2e       	mov	r3, r22
+ 272:	2a 0c       	add	r2, r10
+ 274:	3b 1c       	adc	r3, r11
 		}
 		if (cnt >= 360)                    // 1/20sek
 		{
 			//        PORTB SET (1<<PB4);
 			cnt = 0;
 			ADC_go = 1;                      // Naslednja prekinitev prozi ADC
- 26c:	88 24       	eor	r8, r8
- 26e:	83 94       	inc	r8
+ 276:	88 24       	eor	r8, r8
+ 278:	83 94       	inc	r8
 	miliVolt /= BMS_programm_voltage;*/
 	sei();                               // ENABLE interupt
 
 	while (1)
 	{
 		if (ADC_done == 1)                 // Preveri ali imamo novo meritev napetosti na bateriji
- 270:	80 91 62 00 	lds	r24, 0x0062
- 274:	81 30       	cpi	r24, 0x01	; 1
- 276:	09 f0       	breq	.+2      	; 0x27a <main+0x142>
- 278:	5a c0       	rjmp	.+180    	; 0x32e <main+0x1f6>
+ 27a:	80 91 62 00 	lds	r24, 0x0062
+ 27e:	81 30       	cpi	r24, 0x01	; 1
+ 280:	09 f0       	breq	.+2      	; 0x284 <main+0x14c>
+ 282:	5a c0       	rjmp	.+180    	; 0x338 <main+0x200>
 		{
 			
 			ADC_done = 0;  // Reset AD readout flag
- 27a:	10 92 62 00 	sts	0x0062, r1
+ 284:	10 92 62 00 	sts	0x0062, r1
 			ad_L = ADCL;
- 27e:	84 b1       	in	r24, 0x04	; 4
- 280:	8a 83       	std	Y+2, r24	; 0x02
+ 288:	84 b1       	in	r24, 0x04	; 4
+ 28a:	8a 83       	std	Y+2, r24	; 0x02
 			ad_H = ADCH;
- 282:	85 b1       	in	r24, 0x05	; 5
- 284:	89 83       	std	Y+1, r24	; 0x01
+ 28c:	85 b1       	in	r24, 0x05	; 5
+ 28e:	89 83       	std	Y+1, r24	; 0x01
 			//voltage in milivolts = ADCvalue*ProgrammingVoltage/EEPROMreference
 			ADC_result = (ad_H << 8) + ad_L; // AD value
- 286:	89 81       	ldd	r24, Y+1	; 0x01
- 288:	9a 81       	ldd	r25, Y+2	; 0x02
- 28a:	b8 2e       	mov	r11, r24
- 28c:	aa 24       	eor	r10, r10
- 28e:	95 01       	movw	r18, r10
- 290:	29 0f       	add	r18, r25
- 292:	31 1d       	adc	r19, r1
- 294:	3c 83       	std	Y+4, r19	; 0x04
- 296:	2b 83       	std	Y+3, r18	; 0x03
+ 290:	89 81       	ldd	r24, Y+1	; 0x01
+ 292:	9a 81       	ldd	r25, Y+2	; 0x02
+ 294:	d8 2e       	mov	r13, r24
+ 296:	cc 24       	eor	r12, r12
+ 298:	96 01       	movw	r18, r12
+ 29a:	29 0f       	add	r18, r25
+ 29c:	31 1d       	adc	r19, r1
+ 29e:	3c 83       	std	Y+4, r19	; 0x04
+ 2a0:	2b 83       	std	Y+3, r18	; 0x03
 	
-			miliVolt = (ADC_result * (long)BMS_programm_voltage)/(long)RefVolt;		
- 298:	6b 81       	ldd	r22, Y+3	; 0x03
- 29a:	7c 81       	ldd	r23, Y+4	; 0x04
- 29c:	80 e0       	ldi	r24, 0x00	; 0
- 29e:	90 e0       	ldi	r25, 0x00	; 0
- 2a0:	26 ea       	ldi	r18, 0xA6	; 166
- 2a2:	3e e0       	ldi	r19, 0x0E	; 14
- 2a4:	40 e0       	ldi	r20, 0x00	; 0
- 2a6:	50 e0       	ldi	r21, 0x00	; 0
- 2a8:	51 d0       	rcall	.+162    	; 0x34c <__mulsi3>
- 2aa:	a3 01       	movw	r20, r6
- 2ac:	92 01       	movw	r18, r4
- 2ae:	89 d0       	rcall	.+274    	; 0x3c2 <__divmodsi4>
- 2b0:	79 01       	movw	r14, r18
- 2b2:	8a 01       	movw	r16, r20
+			//miliVolt = (ADC_result * (long)BMS_programm_voltage) / (long)RefVolt;
+			miliVolt = (long)(ADC_result * BMS_programm_voltage) / (long)RefVolt;
+ 2a2:	8b 81       	ldd	r24, Y+3	; 0x03
+ 2a4:	9c 81       	ldd	r25, Y+4	; 0x04
+ 2a6:	68 e6       	ldi	r22, 0x68	; 104
+ 2a8:	70 e1       	ldi	r23, 0x10	; 16
+ 2aa:	55 d0       	rcall	.+170    	; 0x356 <__mulhi3>
+ 2ac:	a0 e0       	ldi	r26, 0x00	; 0
+ 2ae:	b0 e0       	ldi	r27, 0x00	; 0
+ 2b0:	bc 01       	movw	r22, r24
+ 2b2:	cd 01       	movw	r24, r26
+ 2b4:	a3 01       	movw	r20, r6
+ 2b6:	92 01       	movw	r18, r4
+ 2b8:	82 d0       	rcall	.+260    	; 0x3be <__divmodsi4>
+ 2ba:	79 01       	movw	r14, r18
+ 2bc:	8a 01       	movw	r16, r20
 			// Cell voltage more than full. Start balancing
 			// - decrease charging curernt to 1A
 			// - set signal on optocoupler
 			// - set status on UART
 			//if ((ADC_result > RefVolt) && (miliVolt <= Li_Max)){
 			if ((ADC_result > RefVolt)){
- 2b4:	8b 81       	ldd	r24, Y+3	; 0x03
- 2b6:	9c 81       	ldd	r25, Y+4	; 0x04
- 2b8:	c8 16       	cp	r12, r24
- 2ba:	d9 06       	cpc	r13, r25
- 2bc:	40 f4       	brcc	.+16     	; 0x2ce <main+0x196>
+ 2be:	8b 81       	ldd	r24, Y+3	; 0x03
+ 2c0:	9c 81       	ldd	r25, Y+4	; 0x04
+ 2c2:	a8 16       	cp	r10, r24
+ 2c4:	b9 06       	cpc	r11, r25
+ 2c6:	40 f4       	brcc	.+16     	; 0x2d8 <main+0x1a0>
 				//clr_over_pin(); // optocoupler signaling
 				//set_under_pin();  //optocoupler signaling
 				Bat_status = 'O';
 				//increse PWM
 				if (OCR0B < TIMERTOP)
- 2be:	89 b5       	in	r24, 0x29	; 41
- 2c0:	85 3a       	cpi	r24, 0xA5	; 165
- 2c2:	18 f4       	brcc	.+6      	; 0x2ca <main+0x192>
+ 2c8:	89 b5       	in	r24, 0x29	; 41
+ 2ca:	85 3a       	cpi	r24, 0xA5	; 165
+ 2cc:	18 f4       	brcc	.+6      	; 0x2d4 <main+0x19c>
 				{
 					OCR0B++;
- 2c4:	89 b5       	in	r24, 0x29	; 41
- 2c6:	8f 5f       	subi	r24, 0xFF	; 255
- 2c8:	89 bd       	out	0x29, r24	; 41
- 2ca:	5f e4       	ldi	r21, 0x4F	; 79
- 2cc:	95 2e       	mov	r9, r21
+ 2ce:	89 b5       	in	r24, 0x29	; 41
+ 2d0:	8f 5f       	subi	r24, 0xFF	; 255
+ 2d2:	89 bd       	out	0x29, r24	; 41
+ 2d4:	5f e4       	ldi	r21, 0x4F	; 79
+ 2d6:	95 2e       	mov	r9, r21
 			}
 			// cell voltage at absolute maximum
 			// - stop charging
 			// - set signal on optocoupler
 			// - set status on UART
 			if (miliVolt > Li_Max){
- 2ce:	3f e6       	ldi	r19, 0x6F	; 111
- 2d0:	e3 16       	cp	r14, r19
- 2d2:	3f e0       	ldi	r19, 0x0F	; 15
- 2d4:	f3 06       	cpc	r15, r19
- 2d6:	30 e0       	ldi	r19, 0x00	; 0
- 2d8:	03 07       	cpc	r16, r19
- 2da:	30 e0       	ldi	r19, 0x00	; 0
- 2dc:	13 07       	cpc	r17, r19
- 2de:	10 f0       	brcs	.+4      	; 0x2e4 <main+0x1ac>
- 2e0:	41 e5       	ldi	r20, 0x51	; 81
- 2e2:	94 2e       	mov	r9, r20
+ 2d8:	3b e9       	ldi	r19, 0x9B	; 155
+ 2da:	e3 16       	cp	r14, r19
+ 2dc:	30 e1       	ldi	r19, 0x10	; 16
+ 2de:	f3 06       	cpc	r15, r19
+ 2e0:	30 e0       	ldi	r19, 0x00	; 0
+ 2e2:	03 07       	cpc	r16, r19
+ 2e4:	30 e0       	ldi	r19, 0x00	; 0
+ 2e6:	13 07       	cpc	r17, r19
+ 2e8:	10 f0       	brcs	.+4      	; 0x2ee <main+0x1b6>
+ 2ea:	41 e5       	ldi	r20, 0x51	; 81
+ 2ec:	94 2e       	mov	r9, r20
 			// Cell voltage below full.
 			// - full charging
 			// - set signal on optocoupler
 			// - set status on UART
 			//if ((ADC_result <= RefVolt) && (miliVolt >=Li_Min))
 			if ((ADC_result <= RefVolt))
- 2e4:	8b 81       	ldd	r24, Y+3	; 0x03
- 2e6:	9c 81       	ldd	r25, Y+4	; 0x04
- 2e8:	c8 16       	cp	r12, r24
- 2ea:	d9 06       	cpc	r13, r25
- 2ec:	80 f0       	brcs	.+32     	; 0x30e <main+0x1d6>
+ 2ee:	8b 81       	ldd	r24, Y+3	; 0x03
+ 2f0:	9c 81       	ldd	r25, Y+4	; 0x04
+ 2f2:	a8 16       	cp	r10, r24
+ 2f4:	b9 06       	cpc	r11, r25
+ 2f6:	80 f0       	brcs	.+32     	; 0x318 <main+0x1e0>
 			{
 				//if battery is allready full we do some offset for status
 				if(Bat_status=='O' && (ADC_result >= (RefVolt-20))) Bat_status ='O';
- 2ee:	8f e4       	ldi	r24, 0x4F	; 79
- 2f0:	98 16       	cp	r9, r24
- 2f2:	29 f4       	brne	.+10     	; 0x2fe <main+0x1c6>
- 2f4:	8b 81       	ldd	r24, Y+3	; 0x03
- 2f6:	9c 81       	ldd	r25, Y+4	; 0x04
- 2f8:	82 15       	cp	r24, r2
- 2fa:	93 05       	cpc	r25, r3
- 2fc:	10 f4       	brcc	.+4      	; 0x302 <main+0x1ca>
- 2fe:	33 e4       	ldi	r19, 0x43	; 67
- 300:	93 2e       	mov	r9, r19
+ 2f8:	8f e4       	ldi	r24, 0x4F	; 79
+ 2fa:	98 16       	cp	r9, r24
+ 2fc:	29 f4       	brne	.+10     	; 0x308 <main+0x1d0>
+ 2fe:	8b 81       	ldd	r24, Y+3	; 0x03
+ 300:	9c 81       	ldd	r25, Y+4	; 0x04
+ 302:	82 15       	cp	r24, r2
+ 304:	93 05       	cpc	r25, r3
+ 306:	10 f4       	brcc	.+4      	; 0x30c <main+0x1d4>
+ 308:	33 e4       	ldi	r19, 0x43	; 67
+ 30a:	93 2e       	mov	r9, r19
 				else Bat_status='C';
 				if (OCR0B > 0)
- 302:	89 b5       	in	r24, 0x29	; 41
- 304:	88 23       	and	r24, r24
- 306:	19 f0       	breq	.+6      	; 0x30e <main+0x1d6>
+ 30c:	89 b5       	in	r24, 0x29	; 41
+ 30e:	88 23       	and	r24, r24
+ 310:	19 f0       	breq	.+6      	; 0x318 <main+0x1e0>
 				{
 					OCR0B--;
- 308:	89 b5       	in	r24, 0x29	; 41
- 30a:	81 50       	subi	r24, 0x01	; 1
- 30c:	89 bd       	out	0x29, r24	; 41
+ 312:	89 b5       	in	r24, 0x29	; 41
+ 314:	81 50       	subi	r24, 0x01	; 1
+ 316:	89 bd       	out	0x29, r24	; 41
 			}
-			*/
+	*/		
 
 			// send to UART
 			//miliVolt=0xAABB;
 			softuart_putchar('>');
- 30e:	8e e3       	ldi	r24, 0x3E	; 62
- 310:	e6 de       	rcall	.-564    	; 0xde <softuart_putchar>
+ 318:	8e e3       	ldi	r24, 0x3E	; 62
+ 31a:	e1 de       	rcall	.-574    	; 0xde <softuart_putchar>
 			softuart_putchar(Bat_status);
- 312:	89 2d       	mov	r24, r9
- 314:	e4 de       	rcall	.-568    	; 0xde <softuart_putchar>
+ 31c:	89 2d       	mov	r24, r9
+ 31e:	df de       	rcall	.-578    	; 0xde <softuart_putchar>
 			softuart_putchar('-');
- 316:	8d e2       	ldi	r24, 0x2D	; 45
- 318:	e2 de       	rcall	.-572    	; 0xde <softuart_putchar>
+ 320:	8d e2       	ldi	r24, 0x2D	; 45
+ 322:	dd de       	rcall	.-582    	; 0xde <softuart_putchar>
 			// softuart_putchar((miliVolt & 0xFF000000L) >> 24);    //Apply the high byte of the data 
 			// softuart_putchar((miliVolt & 0x00FF0000L) >> 16);   // Apply the uppper middle byte of the data 
 			softuart_putchar((miliVolt & 0x0000FF00L) >> 8);   // Apply the lower middle byte of the data 
- 31a:	8f 2d       	mov	r24, r15
- 31c:	e0 de       	rcall	.-576    	; 0xde <softuart_putchar>
+ 324:	8f 2d       	mov	r24, r15
+ 326:	db de       	rcall	.-586    	; 0xde <softuart_putchar>
 			softuart_putchar((miliVolt & 0x000000FFL));      // Apply the low byte of the data 
- 31e:	8e 2d       	mov	r24, r14
- 320:	de de       	rcall	.-580    	; 0xde <softuart_putchar>
+ 328:	8e 2d       	mov	r24, r14
+ 32a:	d9 de       	rcall	.-590    	; 0xde <softuart_putchar>
 			
 			
-			softuart_putchar(0);
- 322:	80 e0       	ldi	r24, 0x00	; 0
- 324:	dc de       	rcall	.-584    	; 0xde <softuart_putchar>
+			softuart_putchar(OCR0B);
+ 32c:	89 b5       	in	r24, 0x29	; 41
+ 32e:	d7 de       	rcall	.-594    	; 0xde <softuart_putchar>
 			softuart_putchar('\r');
- 326:	8d e0       	ldi	r24, 0x0D	; 13
- 328:	da de       	rcall	.-588    	; 0xde <softuart_putchar>
+ 330:	8d e0       	ldi	r24, 0x0D	; 13
+ 332:	d5 de       	rcall	.-598    	; 0xde <softuart_putchar>
 			softuart_putchar('\0');
- 32a:	80 e0       	ldi	r24, 0x00	; 0
- 32c:	d8 de       	rcall	.-592    	; 0xde <softuart_putchar>
+ 334:	80 e0       	ldi	r24, 0x00	; 0
+ 336:	d3 de       	rcall	.-602    	; 0xde <softuart_putchar>
 
 		
 		}
 		if (cnt >= 360)                    // 1/20sek
- 32e:	80 91 60 00 	lds	r24, 0x0060
- 332:	90 91 61 00 	lds	r25, 0x0061
- 336:	88 56       	subi	r24, 0x68	; 104
- 338:	91 40       	sbci	r25, 0x01	; 1
- 33a:	30 f0       	brcs	.+12     	; 0x348 <main+0x210>
+ 338:	80 91 60 00 	lds	r24, 0x0060
+ 33c:	90 91 61 00 	lds	r25, 0x0061
+ 340:	88 56       	subi	r24, 0x68	; 104
+ 342:	91 40       	sbci	r25, 0x01	; 1
+ 344:	30 f0       	brcs	.+12     	; 0x352 <main+0x21a>
 		{
 			//        PORTB SET (1<<PB4);
 			cnt = 0;
- 33c:	10 92 61 00 	sts	0x0061, r1
- 340:	10 92 60 00 	sts	0x0060, r1
+ 346:	10 92 61 00 	sts	0x0061, r1
+ 34a:	10 92 60 00 	sts	0x0060, r1
 			ADC_go = 1;                      // Naslednja prekinitev prozi ADC
- 344:	80 92 63 00 	sts	0x0063, r8
+ 34e:	80 92 63 00 	sts	0x0063, r8
 		}
 		wdt_reset();                       // Kuza pazi "sedi".
- 348:	a8 95       	wdr
- 34a:	92 cf       	rjmp	.-220    	; 0x270 <main+0x138>
+ 352:	a8 95       	wdr
+ 354:	92 cf       	rjmp	.-220    	; 0x27a <main+0x142>
 
-0000034c <__mulsi3>:
- 34c:	ff 27       	eor	r31, r31
- 34e:	ee 27       	eor	r30, r30
- 350:	bb 27       	eor	r27, r27
- 352:	aa 27       	eor	r26, r26
+00000356 <__mulhi3>:
+ 356:	55 27       	eor	r21, r21
+ 358:	00 24       	eor	r0, r0
 
-00000354 <__mulsi3_loop>:
- 354:	60 ff       	sbrs	r22, 0
- 356:	04 c0       	rjmp	.+8      	; 0x360 <__mulsi3_skip1>
- 358:	a2 0f       	add	r26, r18
- 35a:	b3 1f       	adc	r27, r19
- 35c:	e4 1f       	adc	r30, r20
- 35e:	f5 1f       	adc	r31, r21
+0000035a <__mulhi3_loop>:
+ 35a:	80 ff       	sbrs	r24, 0
+ 35c:	02 c0       	rjmp	.+4      	; 0x362 <__mulhi3_skip1>
+ 35e:	06 0e       	add	r0, r22
+ 360:	57 1f       	adc	r21, r23
 
-00000360 <__mulsi3_skip1>:
- 360:	22 0f       	add	r18, r18
- 362:	33 1f       	adc	r19, r19
- 364:	44 1f       	adc	r20, r20
- 366:	55 1f       	adc	r21, r21
- 368:	96 95       	lsr	r25
- 36a:	87 95       	ror	r24
- 36c:	77 95       	ror	r23
- 36e:	67 95       	ror	r22
- 370:	89 f7       	brne	.-30     	; 0x354 <__mulsi3_loop>
- 372:	00 97       	sbiw	r24, 0x00	; 0
- 374:	76 07       	cpc	r23, r22
- 376:	71 f7       	brne	.-36     	; 0x354 <__mulsi3_loop>
+00000362 <__mulhi3_skip1>:
+ 362:	66 0f       	add	r22, r22
+ 364:	77 1f       	adc	r23, r23
+ 366:	61 15       	cp	r22, r1
+ 368:	71 05       	cpc	r23, r1
+ 36a:	21 f0       	breq	.+8      	; 0x374 <__mulhi3_exit>
+ 36c:	96 95       	lsr	r25
+ 36e:	87 95       	ror	r24
+ 370:	00 97       	sbiw	r24, 0x00	; 0
+ 372:	99 f7       	brne	.-26     	; 0x35a <__mulhi3_loop>
 
-00000378 <__mulsi3_exit>:
- 378:	cf 01       	movw	r24, r30
- 37a:	bd 01       	movw	r22, r26
- 37c:	08 95       	ret
+00000374 <__mulhi3_exit>:
+ 374:	95 2f       	mov	r25, r21
+ 376:	80 2d       	mov	r24, r0
+ 378:	08 95       	ret
 
-0000037e <__udivmodsi4>:
- 37e:	a1 e2       	ldi	r26, 0x21	; 33
- 380:	1a 2e       	mov	r1, r26
- 382:	aa 1b       	sub	r26, r26
- 384:	bb 1b       	sub	r27, r27
- 386:	fd 01       	movw	r30, r26
- 388:	0d c0       	rjmp	.+26     	; 0x3a4 <__udivmodsi4_ep>
+0000037a <__udivmodsi4>:
+ 37a:	a1 e2       	ldi	r26, 0x21	; 33
+ 37c:	1a 2e       	mov	r1, r26
+ 37e:	aa 1b       	sub	r26, r26
+ 380:	bb 1b       	sub	r27, r27
+ 382:	fd 01       	movw	r30, r26
+ 384:	0d c0       	rjmp	.+26     	; 0x3a0 <__udivmodsi4_ep>
 
-0000038a <__udivmodsi4_loop>:
- 38a:	aa 1f       	adc	r26, r26
- 38c:	bb 1f       	adc	r27, r27
- 38e:	ee 1f       	adc	r30, r30
- 390:	ff 1f       	adc	r31, r31
- 392:	a2 17       	cp	r26, r18
- 394:	b3 07       	cpc	r27, r19
- 396:	e4 07       	cpc	r30, r20
- 398:	f5 07       	cpc	r31, r21
- 39a:	20 f0       	brcs	.+8      	; 0x3a4 <__udivmodsi4_ep>
- 39c:	a2 1b       	sub	r26, r18
- 39e:	b3 0b       	sbc	r27, r19
- 3a0:	e4 0b       	sbc	r30, r20
- 3a2:	f5 0b       	sbc	r31, r21
+00000386 <__udivmodsi4_loop>:
+ 386:	aa 1f       	adc	r26, r26
+ 388:	bb 1f       	adc	r27, r27
+ 38a:	ee 1f       	adc	r30, r30
+ 38c:	ff 1f       	adc	r31, r31
+ 38e:	a2 17       	cp	r26, r18
+ 390:	b3 07       	cpc	r27, r19
+ 392:	e4 07       	cpc	r30, r20
+ 394:	f5 07       	cpc	r31, r21
+ 396:	20 f0       	brcs	.+8      	; 0x3a0 <__udivmodsi4_ep>
+ 398:	a2 1b       	sub	r26, r18
+ 39a:	b3 0b       	sbc	r27, r19
+ 39c:	e4 0b       	sbc	r30, r20
+ 39e:	f5 0b       	sbc	r31, r21
 
-000003a4 <__udivmodsi4_ep>:
- 3a4:	66 1f       	adc	r22, r22
- 3a6:	77 1f       	adc	r23, r23
- 3a8:	88 1f       	adc	r24, r24
- 3aa:	99 1f       	adc	r25, r25
- 3ac:	1a 94       	dec	r1
- 3ae:	69 f7       	brne	.-38     	; 0x38a <__udivmodsi4_loop>
- 3b0:	60 95       	com	r22
- 3b2:	70 95       	com	r23
- 3b4:	80 95       	com	r24
- 3b6:	90 95       	com	r25
- 3b8:	9b 01       	movw	r18, r22
- 3ba:	ac 01       	movw	r20, r24
- 3bc:	bd 01       	movw	r22, r26
- 3be:	cf 01       	movw	r24, r30
- 3c0:	08 95       	ret
+000003a0 <__udivmodsi4_ep>:
+ 3a0:	66 1f       	adc	r22, r22
+ 3a2:	77 1f       	adc	r23, r23
+ 3a4:	88 1f       	adc	r24, r24
+ 3a6:	99 1f       	adc	r25, r25
+ 3a8:	1a 94       	dec	r1
+ 3aa:	69 f7       	brne	.-38     	; 0x386 <__udivmodsi4_loop>
+ 3ac:	60 95       	com	r22
+ 3ae:	70 95       	com	r23
+ 3b0:	80 95       	com	r24
+ 3b2:	90 95       	com	r25
+ 3b4:	9b 01       	movw	r18, r22
+ 3b6:	ac 01       	movw	r20, r24
+ 3b8:	bd 01       	movw	r22, r26
+ 3ba:	cf 01       	movw	r24, r30
+ 3bc:	08 95       	ret
 
-000003c2 <__divmodsi4>:
- 3c2:	97 fb       	bst	r25, 7
- 3c4:	09 2e       	mov	r0, r25
- 3c6:	05 26       	eor	r0, r21
- 3c8:	0e d0       	rcall	.+28     	; 0x3e6 <__divmodsi4_neg1>
- 3ca:	57 fd       	sbrc	r21, 7
- 3cc:	04 d0       	rcall	.+8      	; 0x3d6 <__divmodsi4_neg2>
- 3ce:	d7 df       	rcall	.-82     	; 0x37e <__udivmodsi4>
- 3d0:	0a d0       	rcall	.+20     	; 0x3e6 <__divmodsi4_neg1>
- 3d2:	00 1c       	adc	r0, r0
- 3d4:	38 f4       	brcc	.+14     	; 0x3e4 <__divmodsi4_exit>
+000003be <__divmodsi4>:
+ 3be:	97 fb       	bst	r25, 7
+ 3c0:	09 2e       	mov	r0, r25
+ 3c2:	05 26       	eor	r0, r21
+ 3c4:	0e d0       	rcall	.+28     	; 0x3e2 <__divmodsi4_neg1>
+ 3c6:	57 fd       	sbrc	r21, 7
+ 3c8:	04 d0       	rcall	.+8      	; 0x3d2 <__divmodsi4_neg2>
+ 3ca:	d7 df       	rcall	.-82     	; 0x37a <__udivmodsi4>
+ 3cc:	0a d0       	rcall	.+20     	; 0x3e2 <__divmodsi4_neg1>
+ 3ce:	00 1c       	adc	r0, r0
+ 3d0:	38 f4       	brcc	.+14     	; 0x3e0 <__divmodsi4_exit>
 
-000003d6 <__divmodsi4_neg2>:
- 3d6:	50 95       	com	r21
- 3d8:	40 95       	com	r20
- 3da:	30 95       	com	r19
- 3dc:	21 95       	neg	r18
- 3de:	3f 4f       	sbci	r19, 0xFF	; 255
- 3e0:	4f 4f       	sbci	r20, 0xFF	; 255
- 3e2:	5f 4f       	sbci	r21, 0xFF	; 255
+000003d2 <__divmodsi4_neg2>:
+ 3d2:	50 95       	com	r21
+ 3d4:	40 95       	com	r20
+ 3d6:	30 95       	com	r19
+ 3d8:	21 95       	neg	r18
+ 3da:	3f 4f       	sbci	r19, 0xFF	; 255
+ 3dc:	4f 4f       	sbci	r20, 0xFF	; 255
+ 3de:	5f 4f       	sbci	r21, 0xFF	; 255
 
-000003e4 <__divmodsi4_exit>:
- 3e4:	08 95       	ret
+000003e0 <__divmodsi4_exit>:
+ 3e0:	08 95       	ret
 
-000003e6 <__divmodsi4_neg1>:
- 3e6:	f6 f7       	brtc	.-4      	; 0x3e4 <__divmodsi4_exit>
- 3e8:	90 95       	com	r25
- 3ea:	80 95       	com	r24
- 3ec:	70 95       	com	r23
- 3ee:	61 95       	neg	r22
- 3f0:	7f 4f       	sbci	r23, 0xFF	; 255
- 3f2:	8f 4f       	sbci	r24, 0xFF	; 255
- 3f4:	9f 4f       	sbci	r25, 0xFF	; 255
- 3f6:	08 95       	ret
+000003e2 <__divmodsi4_neg1>:
+ 3e2:	f6 f7       	brtc	.-4      	; 0x3e0 <__divmodsi4_exit>
+ 3e4:	90 95       	com	r25
+ 3e6:	80 95       	com	r24
+ 3e8:	70 95       	com	r23
+ 3ea:	61 95       	neg	r22
+ 3ec:	7f 4f       	sbci	r23, 0xFF	; 255
+ 3ee:	8f 4f       	sbci	r24, 0xFF	; 255
+ 3f0:	9f 4f       	sbci	r25, 0xFF	; 255
+ 3f2:	08 95       	ret
 
-000003f8 <_exit>:
- 3f8:	f8 94       	cli
+000003f4 <_exit>:
+ 3f4:	f8 94       	cli
 
-000003fa <__stop_program>:
- 3fa:	ff cf       	rjmp	.-2      	; 0x3fa <__stop_program>
+000003f6 <__stop_program>:
+ 3f6:	ff cf       	rjmp	.-2      	; 0x3f6 <__stop_program>
