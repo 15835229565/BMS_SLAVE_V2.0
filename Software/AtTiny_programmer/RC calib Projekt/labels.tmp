@@ -1,0 +1,76 @@
+<ASSEMBLER_INFO>
+ <VERSION>2.1.42</VERSION>
+ <DEVICE>ATtiny13</DEVICE>
+ <WORKING_DIR>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer</WORKING_DIR>
+ <INCLUDE_PATH>
+  <DIR>Z:\dokumenti\Smart-electro.net\GitHub\BMS_SLAVE_V2.0\Software\AtTiny_programmer</DIR>
+  <DIR>C:\Program Files\Atmel\AVR Tools\AvrAssembler2\Appnotes</DIR>
+ </INCLUDE_PATH>
+ <SOURCE_FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\RC_Calibration.asm</SOURCE_FILE>
+ <INCLUDED_FILES>
+  <FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Device specific\t13.asm</FILE>
+  <FILE>C:\Program Files\Atmel\AVR Tools\AvrAssembler2\Appnotes\tn13def.inc</FILE>
+  <FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\memoryMap.inc</FILE>
+  <FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Device specific\t12_family_pinout.inc</FILE>
+  <FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Interface specific\isp_STK500_interface.inc</FILE>
+  <FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\macros.inc</FILE>
+  <FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE>
+ </INCLUDED_FILES>
+ <OBJECT_FILES>
+  <FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\rc_calib.obj</FILE>
+ </OBJECT_FILES>
+ <HEX_FILES>
+  <FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\rc_calib.hex</FILE>
+ </HEX_FILES>
+ <OUTPUT_FILES>
+  <FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\rc_calib.map</FILE>
+ </OUTPUT_FILES>
+ <LABELS>
+  <Reset><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>88</LINE></Reset>
+  <Init_Stack><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>93</LINE></Init_Stack>
+  <Init_interface><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>107</LINE></Init_interface>
+  <Init_IO><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>115</LINE></Init_IO>
+  <CalibrationBegin><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>121</LINE></CalibrationBegin>
+  <newCalibrateRc><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>208</LINE></newCalibrateRc>
+  <WaitForEepromReady><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>138</LINE></WaitForEepromReady>
+  <CalibSuccessful><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>149</LINE></CalibSuccessful>
+  <CCS_WaitForPinHigh><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>157</LINE></CCS_WaitForPinHigh>
+  <CCS_WaitForPinLow><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>164</LINE></CCS_WaitForPinLow>
+  <Handshake_loop><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>170</LINE></Handshake_loop>
+  <StopHere><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>175</LINE></StopHere>
+  <EOP><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>197</LINE></EOP>
+  <BinSearch><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>215</LINE></BinSearch>
+  <BinSearchLoop><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>218</LINE></BinSearchLoop>
+  <DetermineClockSpeed><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>296</LINE></DetermineClockSpeed>
+  <FreqHit><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>286</LINE></FreqHit>
+  <TryNeighbourghhoodValues><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>238</LINE></TryNeighbourghhoodValues>
+  <AddStep><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>234</LINE></AddStep>
+  <NegateNextStep><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>232</LINE></NegateNextStep>
+  <DownstairsNeighbor><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>245</LINE></DownstairsNeighbor>
+  <AddOscStep><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>247</LINE></AddOscStep>
+  <CalibPassCompleted><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>275</LINE></CalibPassCompleted>
+  <CalibrationFailure><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>282</LINE></CalibrationFailure>
+  <Prepare_Detection><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>298</LINE></Prepare_Detection>
+  <WaitForPinHigh><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>307</LINE></WaitForPinHigh>
+  <WaitForPinLow><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>311</LINE></WaitForPinLow>
+  <DetectHighCC01><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>317</LINE></DetectHighCC01>
+  <DetectHighLoopCC01><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>323</LINE></DetectHighLoopCC01>
+  <DetectLowCC01><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>327</LINE></DetectLowCC01>
+  <DetectLowLoopCC01><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>333</LINE></DetectLowLoopCC01>
+  <DetectHighCCxx><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>338</LINE></DetectHighCCxx>
+  <DetectHighLoopCCxx><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>344</LINE></DetectHighLoopCCxx>
+  <DetectLowCCxx><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>348</LINE></DetectLowCCxx>
+  <DetectLowLoopCCxx><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>354</LINE></DetectLowLoopCCxx>
+  <DetectHighCC40><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>362</LINE></DetectHighCC40>
+  <DetectHighLoopCC40><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>368</LINE></DetectHighLoopCC40>
+  <DetectLowCC40><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>372</LINE></DetectLowCC40>
+  <DetectLowLoopCC40><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>378</LINE></DetectLowLoopCC40>
+  <Detect_End><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>382</LINE></Detect_End>
+  <CountLastOVF><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>384</LINE></CountLastOVF>
+  <MergeTimerHighAndLow><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>392</LINE></MergeTimerHighAndLow>
+  <CompareToLimits><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>395</LINE></CompareToLimits>
+  <TooFast><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>410</LINE></TooFast>
+  <TooSlow><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>413</LINE></TooSlow>
+  <RightInTheEye><FILE>c:\Documents and Settings\Owner\My Documents\bms_slave_studio6\AtTiny_programmer\Common\main.asm</FILE><LINE>407</LINE></RightInTheEye>
+ </LABELS>
+</ASSEMBLER_INFO>
