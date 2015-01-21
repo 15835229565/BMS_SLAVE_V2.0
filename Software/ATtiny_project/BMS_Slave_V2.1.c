@@ -23,6 +23,7 @@
 #include <avr/wdt.h>
 #include <avr/eeprom.h>
 //#include <avr/pgmspace.h>
+#include <util/crc16.h>
 
 // Voltage settings for different battery types
 /*****************************************************/
@@ -81,19 +82,10 @@ volatile static unsigned char  timer_tx_ctr;
 volatile static unsigned char  bits_left_in_tx;
 volatile static unsigned short internal_tx_buffer; /* ! mt: was type uchar - this was wrong */
 
+
 #define set_tx_pin_high() (SOFTUART_TXPORT SET (1<<SOFTUART_TXBIT))
 #define set_tx_pin_low()  (SOFTUART_TXPORT CLR (1<<SOFTUART_TXBIT))
 
-
-//#define BATTERY_OVER   PB0
-//#define BATTERY_UNDER  PB4
-
-//#define set_over_pin()  (PORTB SET (1<<BATTERY_OVER))
-//#define clr_over_pin()  (PORTB CLR (1<<BATTERY_OVER))
-//#define set_under_pin() (PORTB SET (1<<BATTERY_UNDER))
-//#define clr_under_pin() (PORTB CLR (1<<BATTERY_UNDER))
-
-//volatile static unsigned short ADC_result;
 
 
 //#define EE_COMM 0
@@ -104,11 +96,15 @@ volatile static unsigned short internal_tx_buffer; /* ! mt: was type uchar - thi
 #define EE_ADC_LO 3
 
 // MAIN data
-volatile unsigned short cnt = 0;
-volatile char ADC_done = 0;
-volatile char ADC_go = 0;
+volatile unsigned short cnt1 = 0, cnt2 = 0;
+volatile char ADC_done = 0,ADC_go=0;
+//volatile char 100msFlag = 0;
 //unsigned char comm_mode = 0;
-
+ unsigned short int  RefVolt=0;
+ unsigned char avarageCounter=0;
+unsigned char PWM=0;
+ unsigned short int  ADC_result=0;
+unsigned short int  ADC_avgr[10];
 //char tx_data[8];
 
 // INT
@@ -141,15 +137,10 @@ ISR(TIM0_COMPA_vect)
 		timer_tx_ctr = tmp;
 	}
 
-	// ADC
-	/*if (ADC_go == 1)
-	{
-		ADCSRA SET (1<<ADSC);   // Start ADC
-		ADC_go = 0;
-	}*/
-
 	// Timer
-	cnt++;
+	cnt1++;
+	cnt2++;
+
 }
 
 /*ISR(TIM0_COMPB_vect)
@@ -160,7 +151,6 @@ ISR(TIM0_COMPA_vect)
 ISR(ADC_vect)
 {
 	ADC_done = 1;
-    ADCSRA SET (1<<ADSC); //Start ADC
 }
 
 
@@ -290,24 +280,52 @@ static void timer_init(void)
 	//read RC calibration
 	OSCCAL = EEPROM_read(EE_OSZI);
 }
+
+
+//void sendData(unsigned short ADC_resultat,unsigned short RefVoltage,char PWM){
+void sendData(){
+//ADC_result=10240;
+//RefVolt=10240;
+//PWM=255;
+		//crc
+		uint8_t crc8=0;
+		// send to UART
+		softuart_putchar('>');
+		crc8 = _crc_ibutton_update(crc8, '>');
+			
+		softuart_putchar((ADC_result & 0xFF00L) >> 8);   // Apply the lower middle byte of the data 
+		crc8= _crc_ibutton_update(crc8, (ADC_result & 0xFF00L) >> 8);
+
+		softuart_putchar((ADC_result & 0x00FFL));      // Apply the low byte of the data 
+		crc8= _crc_ibutton_update(crc8, (ADC_result & 0x00FFL));
+
+		softuart_putchar((RefVolt & 0xFF00L) >> 8);   // Apply the lower middle byte of the data
+		crc8= _crc_ibutton_update(crc8, (RefVolt & 0xFF00L) >> 8);
+		
+		softuart_putchar((RefVolt & 0x00FFL));      // Apply the low byte of the data
+		crc8= _crc_ibutton_update(crc8, (RefVolt & 0x00FFL));
+			
+		softuart_putchar(PWM);
+		crc8= _crc_ibutton_update(crc8, PWM);
+		
+		softuart_putchar(crc8);
+		softuart_putchar(0xEE);
+		
+}
+
 // MAIN
 int main(void)
 {
-	volatile unsigned char ad_H, ad_L;
-	volatile unsigned short ADC_result;
-
-	char Bat_status=0; 
-	unsigned long miliVolt=0;
-	unsigned short RefVolt;
+	
+	
+			for (int i=0; i<10; i++){
+				ADC_avgr[i]=111;
+			}	
 	wdt_enable(WDTO_2S);       // Set WDT for 2sek
 	wdt_reset();               // Reset WDT.
 
 	//DDRB = 0xFF;
 	DDRB = 0x37;
-	
-	//comm_mode = EEPROM_read(EE_COMM);
-	//set_over_pin();
-	//set_under_pin();
 
 	flag_tx_ready = SU_FALSE;
 	set_tx_pin_high();                   // mt: set to high to avoid garbage on init
@@ -317,129 +335,96 @@ int main(void)
 
 	adc_init();
 	timer_init();
+	
 	//read ADC calibration values from EEPROM if BMS was already calibrated
-//	if (EEPROM_read(EE_ADC_CALIBRATED)==1){
-		ad_H = EEPROM_read(EE_ADC_HI); //ADC calibration value
-		ad_L = EEPROM_read(EE_ADC_LO);
-		RefVolt=(ad_H << 8) + ad_L;
-/*	}else{
+	if (EEPROM_read(EE_ADC_CALIBRATED)==1){
+		RefVolt=(EEPROM_read(EE_ADC_HI) << 8) + EEPROM_read(EE_ADC_LO);
+	}else{
 		//take 10 measurements
 		for (int i=0; i<10; i++){
 			ADCSRA SET (1<<ADSC);             // START ACDC
 			while( ADCSRA & (1<<ADSC) ) {}    // Pool ADC
-			ad_L = ADCL;
-			ad_H = ADCH;
-			miliVolt+=(ad_H << 8) + ad_L;
+			RefVolt+=(ADCH << 8) + ADCL;
 		}
-		miliVolt/=10;
-		EEPROM_write(EE_ADC_HI, ((miliVolt & 0x0000FF00L) >> 8));
-		EEPROM_write(EE_ADC_LO, ((miliVolt & 0x000000FFL)));
+		EEPROM_write(EE_ADC_HI, ((RefVolt & 0xFF00L) >> 8));
+		EEPROM_write(EE_ADC_LO, ((RefVolt & 0x00FFL)));
 		EEPROM_write(EE_ADC_CALIBRATED, 1);
-		RefVolt=miliVolt;
-	}*/
-	
-	//RefVolt=(ad_H << 8) + ad_L;
-	
-	//miliVolt=6990;   //610
-	
-	/*
-	miliVolt*=100; //multiplication before devision to minimize error
-	miliVolt /= BMS_programm_voltage;*/
+	}
+
 	sei();                               // ENABLE interupt
 
+		
 	while (1)
 	{
-		if (ADC_done == 1)                 // Preveri ali imamo novo meritev napetosti na bateriji
+		//10ms interrupt for ADC read. 
+		if(cnt1>=36) cnt1=0;
+		//for first 2.5ms we stop PWM
+		if(cnt1<=9){
+			OCR0B=0;//stop PWM
+			ADC_go=0;
+		}else 
 		{
+			if(ADC_go==0)
+			{
+				ADC_go=1;
+				ADCSRA SET (1<<ADSC); //Start ADC
+				//sendData();
+			}
+		}
+		
+		//if conversion is done we add ADC value to buffer and stop PWM
+		if(ADC_done){
+			ADC_done=0;
+			//OCR0B=(char)PWM; //turn on PWM
 			
-			ADC_done = 0;  // Reset AD readout flag
-			ad_L = ADCL;
-			ad_H = ADCH;
-			//voltage in milivolts = ADCvalue*ProgrammingVoltage/EEPROMreference
-			ADC_result = (ad_H << 8) + ad_L; // AD value
-	
-			miliVolt = (ADC_result * (long)BMS_programm_voltage) / (long)RefVolt;
-			//miliVolt = (long)(ADC_result * BMS_programm_voltage) / (long)RefVolt;
+			//add value into circular buffer
+			ADC_avgr[avarageCounter]=(ADCH<< 8) + ADCL; // AD value
+			//ADC_avgr[avarageCounter]=100; // AD value
+			avarageCounter++;
+			if(avarageCounter>=10) avarageCounter=0;
+			ADC_result=(ADCH<< 8) + ADCL;
+		}
+
+		//100ms interrupt
+		if (cnt2 >= 360)                    // 1/20sek
+		{
+			cnt2 = 0;
+			//calculate ADC value from last 10 measurements
+			/*ADC_result=0;
+			for (int i=0; i<10; i++){
+				ADC_result +=ADC_avgr[i];
+				//ADC_result +=100;
+			}*/
 			
-
-			//Bat_status = 'N';
-
-
 			// Cell voltage more than full. Start balancing
-			// - decrease charging curernt to 1A
-			// - set signal on optocoupler
-			// - set status on UART
-			//if ((ADC_result > RefVolt) && (miliVolt <= Li_Max)){
 			if ((ADC_result > RefVolt)){
-				//clr_over_pin(); // optocoupler signaling
-				//set_under_pin();  //optocoupler signaling
-				Bat_status = 'O';
 				//increse PWM
-				if (OCR0B < TIMERTOP)
+				if (PWM < TIMERTOP)
 				{
-					OCR0B++;
+					PWM++;
 				}
 			}
-			// cell voltage at absolute maximum
-			// - stop charging
-			// - set signal on optocoupler
-			// - set status on UART
-			if (miliVolt > Li_Max){
-				//clr_over_pin();  //optocoupler signaling
-				//set_under_pin();  //optocoupler signaling
-				Bat_status = 'Q';
-			}
-
 			// Cell voltage below full.
 			// - full charging
-			// - set signal on optocoupler
-			// - set status on UART
-			//if ((ADC_result <= RefVolt) && (miliVolt >=Li_Min))
 			if ((ADC_result <= RefVolt))
 			{
-				//if battery is allready full we do some offset for status
-				if(Bat_status=='O' && (ADC_result >= (RefVolt-20))) Bat_status ='O';
-				else Bat_status='C';
-				if (OCR0B > 0)
+				if (PWM > 0)
 				{
-					OCR0B--;
+					PWM--;
 				}
 			}
 			
-
-			//Battery undrevoltage. Set warning.
-/*			if (miliVolt < Li_Min)
-			{
-				Bat_status = 'M';
-				//clr_under_pin();
-				//set_over_pin();  //optocoupler signaling
-			}
-	*/		
-
-			// send to UART
-			//miliVolt=0xAABB;
-			softuart_putchar('>');
-			softuart_putchar(Bat_status);
-			softuart_putchar('-');
-			// softuart_putchar((miliVolt & 0xFF000000L) >> 24);    //Apply the high byte of the data 
-			// softuart_putchar((miliVolt & 0x00FF0000L) >> 16);   // Apply the uppper middle byte of the data 
-			softuart_putchar((miliVolt & 0x0000FF00L) >> 8);   // Apply the lower middle byte of the data 
-			softuart_putchar((miliVolt & 0x000000FFL));      // Apply the low byte of the data 
+			//send the data to UART
+			//sendData(ADC_result, RefVolt, PWM);
+			sendData();
 			
-			
-			softuart_putchar(OCR0B);
-			softuart_putchar('\r');
-			softuart_putchar('\0');
+		}			
+
+
+
+
+		wdt_reset();                       // Kuza pazi "sedi".	
+	}
+}
 
 		
-		}
-		if (cnt >= 360)                    // 1/20sek
-		{
-			//        PORTB SET (1<<PB4);
-			cnt = 0;
-			ADC_go = 1;                      // Naslednja prekinitev prozi ADC
-		}
-		wdt_reset();                       // Kuza pazi "sedi".
-	}
-	
-}
