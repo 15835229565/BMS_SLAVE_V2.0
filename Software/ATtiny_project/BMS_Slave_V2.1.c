@@ -100,10 +100,10 @@ volatile unsigned short cnt1 = 0, cnt2 = 0;
 volatile char ADC_done = 0,ADC_go=0;
 //volatile char 100msFlag = 0;
 //unsigned char comm_mode = 0;
- unsigned short int  RefVolt=0;
- unsigned char avarageCounter=0;
-unsigned char PWM=0;
- unsigned short int  ADC_result=0;
+unsigned short int  RefVolt;
+unsigned char avarageCounter=0;
+volatile unsigned char PWM=0;
+unsigned short int  ADC_result=0;
 unsigned short int  ADC_avgr[10];
 //char tx_data[8];
 
@@ -243,21 +243,6 @@ unsigned char EEPROM_read(unsigned char ucAddress)
 	return EEDR;                         // Return data from data register
 }
 
-// Pomozne funkcije
-
-/*char to_hex(char bits4)
-{
-	char tp_bits;
-	tp_bits = bits4 & 0x0F;
-	if (tp_bits <= 9)
-	{
-		return(48 + tp_bits);
-	}
-	else
-	{
-		return(55 + tp_bits);
-	}
-}*/
 static void timer_init(void)
 {
 	unsigned char sreg_tmp;
@@ -284,9 +269,7 @@ static void timer_init(void)
 
 //void sendData(unsigned short ADC_resultat,unsigned short RefVoltage,char PWM){
 void sendData(){
-//ADC_result=10240;
-//RefVolt=10240;
-//PWM=255;
+
 		//crc
 		uint8_t crc8=0;
 		// send to UART
@@ -316,15 +299,15 @@ void sendData(){
 // MAIN
 int main(void)
 {
+	volatile unsigned char ad_H, ad_L;
 	
-	
-			for (int i=0; i<10; i++){
-				ADC_avgr[i]=111;
-			}	
+	//we set default value of voltage to cca 3.5V in order not to get wrong readings at first 1s of operation
+	for (int i=0; i<10; i++){
+		ADC_avgr[i]=300; 
+	}	
 	wdt_enable(WDTO_2S);       // Set WDT for 2sek
 	wdt_reset();               // Reset WDT.
 
-	//DDRB = 0xFF;
 	DDRB = 0x37;
 
 	flag_tx_ready = SU_FALSE;
@@ -344,22 +327,25 @@ int main(void)
 		for (int i=0; i<10; i++){
 			ADCSRA SET (1<<ADSC);             // START ACDC
 			while( ADCSRA & (1<<ADSC) ) {}    // Pool ADC
-			RefVolt+=(ADCH << 8) + ADCL;
+			ad_L = ADCL;
+			ad_H = ADCH;
+			RefVolt+=(ad_H << 8) + ad_L;
 		}
 		EEPROM_write(EE_ADC_HI, ((RefVolt & 0xFF00L) >> 8));
 		EEPROM_write(EE_ADC_LO, ((RefVolt & 0x00FFL)));
 		EEPROM_write(EE_ADC_CALIBRATED, 1);
 	}
-
-	sei();                               // ENABLE interupt
-
+	
+	// ENABLE interrupts
+	sei();                              
 		
+	//main loop
 	while (1)
 	{
 		//10ms interrupt for ADC read. 
 		if(cnt1>=36) cnt1=0;
 		//for first 2.5ms we stop PWM
-		if(cnt1<=9){
+		if(cnt1<=1){
 			OCR0B=0;//stop PWM
 			ADC_go=0;
 		}else 
@@ -368,21 +354,21 @@ int main(void)
 			{
 				ADC_go=1;
 				ADCSRA SET (1<<ADSC); //Start ADC
-				//sendData();
 			}
 		}
 		
 		//if conversion is done we add ADC value to buffer and stop PWM
 		if(ADC_done){
 			ADC_done=0;
-			//OCR0B=(char)PWM; //turn on PWM
+			OCR0B=PWM; //turn on PWM
 			
 			//add value into circular buffer
-			ADC_avgr[avarageCounter]=(ADCH<< 8) + ADCL; // AD value
-			//ADC_avgr[avarageCounter]=100; // AD value
+			ad_L = ADCL;
+			ad_H = ADCH;
+			ADC_avgr[avarageCounter]=(ad_H << 8) + ad_L; // AD value
 			avarageCounter++;
 			if(avarageCounter>=10) avarageCounter=0;
-			ADC_result=(ADCH<< 8) + ADCL;
+
 		}
 
 		//100ms interrupt
@@ -390,11 +376,11 @@ int main(void)
 		{
 			cnt2 = 0;
 			//calculate ADC value from last 10 measurements
-			/*ADC_result=0;
+			ADC_result=0;
 			for (int i=0; i<10; i++){
 				ADC_result +=ADC_avgr[i];
 				//ADC_result +=100;
-			}*/
+			}
 			
 			// Cell voltage more than full. Start balancing
 			if ((ADC_result > RefVolt)){
@@ -415,14 +401,9 @@ int main(void)
 			}
 			
 			//send the data to UART
-			//sendData(ADC_result, RefVolt, PWM);
 			sendData();
 			
 		}			
-
-
-
-
 		wdt_reset();                       // Kuza pazi "sedi".	
 	}
 }

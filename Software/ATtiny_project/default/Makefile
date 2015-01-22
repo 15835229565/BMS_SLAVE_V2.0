@@ -37,7 +37,7 @@ SUBDIRS :=
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
-../BMS_Slave_V2.0.c
+../BMS_Slave_V2.1.c
 
 
 PREPROCESSING_SRCS += 
@@ -47,16 +47,16 @@ ASM_SRCS +=
 
 
 OBJS +=  \
-BMS_Slave_V2.0.o
+BMS_Slave_V2.1.o
 
 OBJS_AS_ARGS +=  \
-BMS_Slave_V2.0.o
+BMS_Slave_V2.1.o
 
 C_DEPS +=  \
-BMS_Slave_V2.0.d
+BMS_Slave_V2.1.d
 
 C_DEPS_AS_ARGS +=  \
-BMS_Slave_V2.0.d
+BMS_Slave_V2.1.d
 
 OUTPUT_FILE_PATH +=BMS.elf
 

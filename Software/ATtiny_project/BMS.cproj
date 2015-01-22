@@ -88,6 +88,9 @@
     <UsesExternalMakeFile>False</UsesExternalMakeFile>
     <ExternalMakeFilePath>C:\Documents and Settings\Owner\My Documents\bms_slave_studio6\default\Makefile</ExternalMakeFilePath>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'debug' ">
+    <OutputPath>bin\debug\</OutputPath>
+  </PropertyGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
   <ItemGroup>
     <None Include="BMS_Slave_V2.0.c">
